@@ -24,7 +24,7 @@ public class Clicker implements Runnable{
 	private Point[] cardslots = new Point[4]; 
 	private Point playout;
 	private boolean autoplay;
-	private boolean doubleplayout =false;
+	private boolean doubleplayout = true;
 	private int truppenwait = 180;
 
 	public Clicker() {
@@ -89,15 +89,15 @@ public class Clicker implements Runnable{
 
 					//check für ok-.knopf
 					if(((System.currentTimeMillis() - start) / 1000) > 20) {//game is older then 20 seconds
-						if(checkOK(end, rob))
-							okcount ++;
-						else 
-							okcount = 0;//reste the counter
-						if(okcount > 5) {
-							Main.get().ui.info("OK-button detected!");
-							System.out.println("OK-Button-detected!");
-							break;
-						}
+						if(checkOK(end, rob)) {//check
+							okcount ++;//ok button detected
+							if(okcount > 3) {
+								Main.get().ui.info("OK-button detected!");
+								System.out.println("OK-Button-detected!");
+								break;
+							}
+						} else 
+							okcount = 0;//reset
 					}
 
 					//try to play out a card
@@ -117,9 +117,14 @@ public class Clicker implements Runnable{
 					int waittime = ( (int) (((truppenwait * 100) / modifier) - (System.currentTimeMillis()- lastwait)) );//how long to wait?
 					while (waittime > 3000) {//check for the ok-button every 3 seconds
 						long startwait = System.currentTimeMillis();//record needed time
-						if(checkOK(end, rob))//check
+						if(checkOK(end, rob)) {//check
 							okcount ++;//ok button detected
-						else 
+							if(okcount > 3) {
+								Main.get().ui.info("OK-button detected!");
+								System.out.println("OK-Button-detected!");
+								break;
+							}
+						} else 
 							okcount = 0;//reset
 						sleep((int) (3000 - (System.currentTimeMillis() - startwait)));//sleep the rest of 3 seconds, that was not gone for checking
 						waittime = (int) (waittime - (System.currentTimeMillis() - startwait));//calculate waittime that is left
