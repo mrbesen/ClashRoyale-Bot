@@ -76,8 +76,6 @@ public class Clicker implements Runnable{
 				sleep(500);
 				clickL(rob, battle);//smash the start button
 				sleep(1000);
-				if(!should_run)
-					break;
 				clickL(rob, battle);//press start again (if there is an alert poping up)
 				//battle is starting up
 				sleep(9000);//wait for the battle to start (loading screen)
@@ -93,8 +91,13 @@ public class Clicker implements Runnable{
 					if(((System.currentTimeMillis() - start) / 1000) > 20) {//game is older then 20 seconds
 						if(checkOK(end, rob))
 							okcount ++;
-						if(okcount > 5)
+						else 
+							okcount = 0;//reste the counter
+						if(okcount > 5) {
+							Main.get().ui.info("OK-button detected!");
+							System.out.println("OK-Button-detected!");
 							break;
+						}
 					}
 
 					//try to play out a card
@@ -116,6 +119,8 @@ public class Clicker implements Runnable{
 						long startwait = System.currentTimeMillis();//record needed time
 						if(checkOK(end, rob))//check
 							okcount ++;//ok button detected
+						else 
+							okcount = 0;//reset
 						sleep((int) (3000 - (System.currentTimeMillis() - startwait)));//sleep the rest of 3 seconds, that was not gone for checking
 						waittime = (int) (waittime - (System.currentTimeMillis() - startwait));//calculate waittime that is left
 					}
@@ -125,14 +130,9 @@ public class Clicker implements Runnable{
 				}
 				skipbattle = false;
 				inbattle = false;
+				clickL(rob, end);//ok button
 				Main.get().ui.info("Battle ended.");
-
-				if(!should_run)
-					break;
-				clickL(rob, end);//ok knopf
-				if(!should_run)
-					break;
-				sleep(10000);//10 sec-lade screen
+				sleep(10000);//10 sec-loading screen
 			}
 		} catch (AWTException e) {
 			e.printStackTrace();
@@ -209,6 +209,8 @@ public class Clicker implements Runnable{
 	}
 
 	private void clickL(Robot b, Point a) {
+		if(!should_run)
+			return;
 		Point old = getMouse();
 		b.mouseMove(a.x, a.y);
 		sleep(50);
