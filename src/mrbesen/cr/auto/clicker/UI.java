@@ -233,6 +233,4 @@ public class UI implements ActionListener, ChangeListener{
 	public void info(String a) {
 		info.setText(a);
 	}
-
-
 }
