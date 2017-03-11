@@ -43,7 +43,8 @@ public class UI implements ActionListener, ChangeListener{
 			new PosSelector(this, "Card2",false, 1),
 			new PosSelector(this, "Card3",false, 2),
 			new PosSelector(this, "Card4", false, 3),
-			new PosSelector(this, "Playout", false, 6)
+			new PosSelector(this, "Playout", false, 6),
+			new PosSelector(this, "Top Left", false, 7)
 	};
 
 	JButton skip = new JButton("SKIP"); // the button, to skip waiting

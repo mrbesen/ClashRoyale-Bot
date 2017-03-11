@@ -1,9 +1,12 @@
 package mrbesen.cr.auto.clicker;
 
 import java.awt.AWTException;
+import java.awt.Color;
 import java.awt.MouseInfo;
+import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
+import java.awt.image.BufferedImage;
 
 public class Clicker implements Runnable{
 
@@ -13,6 +16,8 @@ public class Clicker implements Runnable{
 	private boolean skipbattle = false;
 	private Thread thread;
 
+	private Point top_left;
+
 	private Point battle;
 	private Point end;
 
@@ -20,7 +25,7 @@ public class Clicker implements Runnable{
 	private Point playout;
 	private boolean autoplay;
 	private boolean doubleplayout =false;
-	private int truppenwait = 2;
+	private int truppenwait = 180;
 
 	public Clicker() {
 	}
@@ -53,8 +58,8 @@ public class Clicker implements Runnable{
 		if(isRunning())
 			if(inbattle)
 				skipbattle = true;
-		
-			thread.interrupt();
+
+		thread.interrupt();
 	}
 
 	public boolean isRunning() {
@@ -68,39 +73,60 @@ public class Clicker implements Runnable{
 		try {
 			Robot rob = new Robot();
 			while(should_run) {
-				clickL(rob, battle);//start knopf
+				sleep(500);
+				clickL(rob, battle);//smash the start button
 				sleep(1000);
 				if(!should_run)
 					break;
-				clickL(rob, battle);//start knopf bestätigen
-				//battle running
+				clickL(rob, battle);//press start again (if there is an alert poping up)
+				//battle is starting up
 				sleep(9000);//wait for the battle to start (loading screen)
 				Main.get().ui.info("Battle started.");
 				inbattle = true;
 				int modifier = 1;
 				long start = System.currentTimeMillis();
-				long lastwait = start;//das delay der runde mit ein rechnen
+				long lastwait = start;//actions like moving mouse and do stuff gets messured and subtracted of the wait's
+				int okcount = 0;
 				while( ((System.currentTimeMillis() - start) / 6000) < 41 & should_run & !skipbattle) {
-					if(((System.currentTimeMillis() - start) / 60000f) > 2) //speed up! (nach her durch 2 teilen)
-						modifier = 2;
-					//try to play a round
+
+					//check für ok-.knopf
+					if(((System.currentTimeMillis() - start) / 1000) > 20) {//game is older then 20 seconds
+						if(checkOK(end, rob))
+							okcount ++;
+						if(okcount > 5)
+							break;
+					}
+
+					//try to play out a card
 					if(autoplay) {
-						playout(card, rob);
-						card = (card +1) % 4;//next
+						playout(card, rob);//try to play a card
+						card = (card +1) % 4;//move card pointer to the next
 						if(doubleplayout) {
 							sleep(750);
 							playout(card, rob);
 							card = (card +1) % 4;//next
 						}
 					}
-					//   eingestellter wert (0.1 sec) ggf. durch 2 teilen    vergangene zeit abziehen (zeit fürs setztem der letzten truppen)   
-					sleep((int) (((truppenwait * 100) / modifier) - (System.currentTimeMillis()- lastwait)));//chillen
-					lastwait = System.currentTimeMillis();
+
+					if(((System.currentTimeMillis() - start) / 60000f) > 2) //game older than 2 minutes -> speed the playout process up!
+						modifier = 2;
+					//        eingestellter wert (0.1 sec) ggf. durch 2 teilen   vergangene zeit abziehen (zeit fürs setztem der letzten truppen)   
+					int waittime = ( (int) (((truppenwait * 100) / modifier) - (System.currentTimeMillis()- lastwait)) );//how long to wait?
+					while (waittime > 3000) {//check for the ok-button every 3 seconds
+						long startwait = System.currentTimeMillis();//record needed time
+						if(checkOK(end, rob))//check
+							okcount ++;//ok button detected
+						sleep((int) (3000 - (System.currentTimeMillis() - startwait)));//sleep the rest of 3 seconds, that was not gone for checking
+						waittime = (int) (waittime - (System.currentTimeMillis() - startwait));//calculate waittime that is left
+					}
+					sleep(waittime);//wait
+
+					lastwait = System.currentTimeMillis();//restart the messurement of time used by the actions
 				}
 				skipbattle = false;
 				inbattle = false;
 				Main.get().ui.info("Battle ended.");
-				
+
 				if(!should_run)
 					break;
 				clickL(rob, end);//ok knopf
@@ -111,17 +137,22 @@ public class Clicker implements Runnable{
 		} catch (AWTException e) {
 			e.printStackTrace();
 		}
-		running = false;
+		running = false;//remove the running flag
 	}
 
+	/**
+	 * Try to play out an Card. fakes 2 mouse clicks. One at the card, and one at the defined playout spot. 
+	 * @param card card nummber (0-3)
+	 * @param rob the Robot Object to use
+	 */
 	private void playout(int card, Robot rob) {
 		if(cardslots[card] != null) {//card is selectable
 			clickL(rob, cardslots[card]);//click on the card slot
-			sleep(450);
+			sleep(450);//lets Teamviewer transmit the data to the phone and let the phone some time zto sumbit the data to supercell.
 			if(playout != null)//a specified playout spot
 				clickL(rob, playout);//click on the playout location
 			else 
-				clickL(rob, battle);//non specified playout spot
+				clickL(rob, battle);//non specified playout spot (the battle start button is a good position to play out cards)
 		}
 	}
 
@@ -136,6 +167,8 @@ public class Clicker implements Runnable{
 			Main.get().ui.refresh();
 		} else if(num == 6)
 			playout = a;
+		else if(num == 7)
+			top_left = a;
 	}
 
 	public boolean isSet(int num) {
@@ -153,6 +186,8 @@ public class Clicker implements Runnable{
 			return battle;
 		else if(num == 6)
 			return playout;
+		else if(num == 7)
+			return top_left;
 
 		return null;
 	}
@@ -197,13 +232,42 @@ public class Clicker implements Runnable{
 		return MouseInfo.getPointerInfo().getLocation().y;
 	}
 
+	/**
+	 * This method checks a squared radius of 10 px around the Point and compares the screen color with the color of the ok-button, that ends an game. 
+	 * @param p the point to scann
+	 * @param bot the Robot object to use
+	 * @return true, if there are more then 70px alike enough
+	 */
+	private boolean checkOK(Point p, Robot bot) {
+		//long start = System.currentTimeMillis();
+		int count = 0;
+		Color goalcolor = new Color(85, 170, 254);//the wanted color
+		BufferedImage img = bot.createScreenCapture(new Rectangle(p.x-10, p.y-10, 20, 20));//smile
+		for (int x = 0; x < 20; x++) {
+			for (int y = 0; y < 20; y++) {
+				int color = img.getRGB(x, y);
+				int red = (color & 0x00ff0000) >> 16;
+				int green = (color & 0x0000ff00) >> 8;
+				int blue = color & 0x000000ff;
+				double distance = Math.sqrt(Math.pow((blue - goalcolor.getBlue()), 2)
+						+ Math.pow((red - goalcolor.getRed()), 2) + Math.pow((green - goalcolor.getGreen()), 2));//calculate the distance between the goalcolor and the test color
+				// System.out.println("distance: " + distance);
+				if (distance < 25)
+					count++;
+			}
+		}
+
+//		System.out.println("checking ok takes: " + (System.currentTimeMillis() - start));//some performance checking
+		return count > 70;
+	}
+
 	public Point getMouse() {
 		return new Point(getMousex(), getMousey());
 	}
 
 	public String serialize() {
 		String out = "";
-		for(int i = 0; i < 7; i++) {
+		for(int i = 0; i < 8; i++) {
 			Point p = get(i);
 			String ps = "null";
 			if(p != null)
