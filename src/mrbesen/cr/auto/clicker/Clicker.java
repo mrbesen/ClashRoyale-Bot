@@ -10,6 +10,8 @@ import java.awt.image.BufferedImage;
 
 public class Clicker implements Runnable{
 
+	private int okcountmin = 2;//min count of ok button detections in a row, to trigger a new round.
+	
 	private boolean running = false;
 	private boolean should_run = false;
 	private boolean inbattle = false;
@@ -31,6 +33,8 @@ public class Clicker implements Runnable{
 	}
 
 	private void sleep( int ms) {
+		if(skipbattle)
+			return;
 		try {
 			Thread.sleep(ms);
 		} catch (InterruptedException e) {//when skip is applyed
@@ -58,7 +62,6 @@ public class Clicker implements Runnable{
 		if(isRunning())
 			if(inbattle)
 				skipbattle = true;
-
 		thread.interrupt();
 	}
 
@@ -91,9 +94,10 @@ public class Clicker implements Runnable{
 					if(((System.currentTimeMillis() - start) / 1000) > 20) {//game is older then 20 seconds
 						if(checkOK(end, rob)) {//check
 							okcount ++;//ok button detected
-							if(okcount > 3) {
+							if(okcount >= okcountmin) {
 								Main.get().ui.info("OK-button detected!");
 								System.out.println("OK-Button-detected!");
+								skipbattle = true;
 								break;
 							}
 						} else 
@@ -115,18 +119,19 @@ public class Clicker implements Runnable{
 						modifier = 2;
 					//        eingestellter wert (0.1 sec) ggf. durch 2 teilen   vergangene zeit abziehen (zeit fürs setztem der letzten truppen)   
 					int waittime = ( (int) (((truppenwait * 100) / modifier) - (System.currentTimeMillis()- lastwait)) );//how long to wait?
-					while (waittime > 3000) {//check for the ok-button every 3 seconds
+					while (waittime > 1500 & !skipbattle) {//check for the ok-button every 3 seconds
 						long startwait = System.currentTimeMillis();//record needed time
 						if(checkOK(end, rob)) {//check
 							okcount ++;//ok button detected
-							if(okcount > 3) {
+							if(okcount >= okcountmin) {
 								Main.get().ui.info("OK-button detected!");
 								System.out.println("OK-Button-detected!");
+								skipbattle = true;
 								break;
 							}
 						} else 
 							okcount = 0;//reset
-						sleep((int) (3000 - (System.currentTimeMillis() - startwait)));//sleep the rest of 3 seconds, that was not gone for checking
+						sleep((int) (1500 - (System.currentTimeMillis() - startwait)));//sleep the rest of 3 seconds, that was not gone for checking
 						waittime = (int) (waittime - (System.currentTimeMillis() - startwait));//calculate waittime that is left
 					}
 					sleep(waittime);//wait
