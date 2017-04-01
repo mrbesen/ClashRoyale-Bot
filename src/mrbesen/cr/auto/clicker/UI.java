@@ -43,8 +43,8 @@ public class UI implements ActionListener, ChangeListener{
 			new PosSelector(this, "Card2",false, 1),
 			new PosSelector(this, "Card3",false, 2),
 			new PosSelector(this, "Card4", false, 3),
-			new PosSelector(this, "Playout", false, 6),
-			new PosSelector(this, "Top Left", false, 7)
+			new PosSelector(this, "Playout", false, 6)//,
+			//new PosSelector(this, "Top Left", false, 7)
 	};
 
 	JButton skip = new JButton("SKIP"); // the button, to skip waiting
@@ -53,8 +53,8 @@ public class UI implements ActionListener, ChangeListener{
 
 	JLabel info = new JLabel("Define positions, to start.");
 
-	JSlider truppenwait = new JSlider(JSlider.HORIZONTAL, 1, 200, 180);
-	JLabel wait = new JLabel("18.0");
+	JSlider truppenwait = new JSlider(JSlider.HORIZONTAL, 1, 300, 180);
+	JLabel wait = new JLabel("Waittime between playouts: 18.0");
 	
 	Clicker bot = new Clicker();
 
@@ -79,7 +79,10 @@ public class UI implements ActionListener, ChangeListener{
 		skip.setEnabled(false);
 		start.setEnabled(false);
 
-		doubleplace.setSelected(true);
+		doubleplace.setSelected(false);
+		doubleplace.setEnabled(false);
+		
+		truppenwait.setEnabled(false);
 		
 		skip.addActionListener(this);
 		start.addActionListener(this);
@@ -153,9 +156,16 @@ public class UI implements ActionListener, ChangeListener{
 			}
 		} else if(src instanceof JCheckBox) {
 			JCheckBox srcb = (JCheckBox) src;
-			if(srcb.equals(autoplay))
+			if(srcb.equals(autoplay)) {
 				bot.setAutoPlay(srcb.isSelected());
-			else if(srcb.equals(doubleplace)) {
+				if(srcb.isSelected()) {
+					truppenwait.setEnabled(true);
+					doubleplace.setEnabled(true);
+				} else {
+					truppenwait.setEnabled(false);
+					doubleplace.setEnabled(false);
+				}
+			} else if(srcb.equals(doubleplace)) {
 				bot.setDoublePlay(srcb.isSelected());
 				if(srcb.isSelected()) {//*2
 					truppenwait.setValue(truppenwait.getValue()*2);
@@ -173,7 +183,7 @@ public class UI implements ActionListener, ChangeListener{
 			JSlider slider = (JSlider) o;
 			if(slider.equals(truppenwait)) {
 				bot.setWait(slider.getValue());
-				wait.setText(""+(slider.getValue()/10f));
+				wait.setText("Waittime between playouts: "+(slider.getValue()/10f));
 			}
 		}
 	}
@@ -184,8 +194,24 @@ public class UI implements ActionListener, ChangeListener{
 				Scanner s = new Scanner(file);
 				while(s.hasNextLine()) {
 					String split[] = s.nextLine().split(" ",2);
-					if(!split[1].equals("null"))
-						bot.set(new Point(split[1]), Integer.parseInt(split[0]));
+					if(!split[1].equals("null")) {
+						int num = Integer.parseInt(split[0]);
+						if(num > 100) {
+							if(num == 101) {//truppenwait
+								int wait = Integer.parseInt(split[1]);
+								truppenwait.setValue(wait);
+							} else if(num == 102) { // double playout
+								boolean dp = Boolean.parseBoolean(split[1]);
+								if(dp) {
+									autoplay.setSelected(true);
+									doubleplace.setEnabled(true);
+									truppenwait.setEnabled(true);
+								}
+								doubleplace.setSelected(dp);
+							}
+						} else 
+							bot.set(new Point(split[1]), num);
+					}
 				}
 				s.close();
 				refresh();
@@ -207,7 +233,7 @@ public class UI implements ActionListener, ChangeListener{
 				file.createNewFile();
 
 			FileWriter fw = new FileWriter(file);
-			fw.write(bot.serialize());
+			fw.write(bot.serialize()+"\n101 "+ truppenwait.getValue() + "\n102 " + doubleplace.isSelected());
 			fw.flush();
 			fw.close();
 
