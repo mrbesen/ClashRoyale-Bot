@@ -84,19 +84,19 @@ public class Clicker implements Runnable{
 				sleep(9000);//wait for the battle to start (loading screen)
 				Main.get().ui.info("Battle started.");
 				inbattle = true;
-				int modifier = 1;
+				float modifier = 1;
 				long start = System.currentTimeMillis();
 				long lastwait = start;//actions like moving mouse and do stuff gets messured and subtracted of the wait's
 				int okcount = 0;
 				while( ((System.currentTimeMillis() - start) / 6000) < 41 & should_run & !skipbattle) {
 
-					//check für ok-.knopf
-					if(((System.currentTimeMillis() - start) / 1000) > 20) {//game is older then 20 seconds
+					//check für ok-button
+					if(round(start) > 20) {//game is older then 20 seconds
 						if(checkOK(end, rob)) {//check
 							okcount ++;//ok button detected
 							if(okcount >= okcountmin) {
 								Main.get().ui.info("OK-button detected!");
-								System.out.println("OK-Button-detected!");
+//								System.out.println("OK-Button-detected!");
 								skipbattle = true;
 								break;
 							}
@@ -115,8 +115,10 @@ public class Clicker implements Runnable{
 						}
 					}
 
-					if(((System.currentTimeMillis() - start) / 60000f) > 2) //game older than 2 minutes -> speed the playout process up!
+					if(round(start) >= 115) //game older than 2 minutes -> speed the playout process up!
 						modifier = 2;
+					else if(round(start) >= (115 - (truppenwait / 2))) //remove half waittime and do half speed.
+						modifier = 1.5f;
 					//        eingestellter wert (0.1 sec) ggf. durch 2 teilen   vergangene zeit abziehen (zeit fürs setztem der letzten truppen)   
 					int waittime = ( (int) (((truppenwait * 100) / modifier) - (System.currentTimeMillis()- lastwait)) );//how long to wait?
 					while (waittime > 1500 & !skipbattle) {//check for the ok-button every 3 seconds
@@ -147,7 +149,11 @@ public class Clicker implements Runnable{
 		} catch (AWTException e) {
 			e.printStackTrace();
 		}
-		running = false;//remove the running flag
+		running= false;//remove the running flag
+	}
+	
+	private float round(long start) {//returns how old the round is in 0.1 seconds
+		return ((System.currentTimeMillis() - start) / 1000);
 	}
 
 	/**
@@ -156,6 +162,7 @@ public class Clicker implements Runnable{
 	 * @param rob the Robot Object to use
 	 */
 	private void playout(int card, Robot rob) {
+		Main.get().ui.info("Playout: " + card);
 		if(cardslots[card] != null) {//card is selectable
 			clickL(rob, cardslots[card]);//click on the card slot
 			sleep(450);//lets Teamviewer transmit the data to the phone and let the phone some time zto sumbit the data to supercell.
