@@ -162,7 +162,7 @@ public class Clicker implements Runnable{
 	 * @param rob the Robot Object to use
 	 */
 	private void playout(int card, Robot rob) {
-		Main.get().ui.info("Playout: " + card);
+		Main.get().ui.info("Playout: " + (card+1));
 		if(cardslots[card] != null) {//card is selectable
 			clickL(rob, cardslots[card]);//click on the card slot
 			sleep(450);//lets Teamviewer transmit the data to the phone and let the phone some time zto sumbit the data to supercell.
