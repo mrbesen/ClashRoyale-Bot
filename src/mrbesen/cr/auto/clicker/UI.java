@@ -59,7 +59,7 @@ public class UI implements ActionListener, ChangeListener{
 	
 	Slider[] slider = {
 			new Slider("Waittime: ","s", 1,300,180,-1, this, false),
-			new Slider("Radius of Placement: ","px",0,40,15,0,this,true)
+			new Slider("Radius of Placement: ","px",0,40,15,0,this,false)
 	};
 	
 	Clicker bot = new Clicker();
