@@ -28,9 +28,7 @@ public class Clicker implements Runnable{
 	private boolean autoplay;
 	private boolean doubleplayout = true;
 	private int truppenwait = 180;
-
-	public Clicker() {
-	}
+	private int randomness = 15;
 
 	private void sleep( int ms) {
 		if(skipbattle)
@@ -121,13 +119,13 @@ public class Clicker implements Runnable{
 						modifier = 1.5f;
 					//        eingestellter wert (0.1 sec) ggf. durch 2 teilen   vergangene zeit abziehen (zeit fürs setztem der letzten truppen)   
 					int waittime = ( (int) (((truppenwait * 100) / modifier) - (System.currentTimeMillis()- lastwait)) );//how long to wait?
+					Main.get().ui.info("Waiting for: " + waittime);
 					while (waittime > 1500 & !skipbattle) {//check for the ok-button every 3 seconds
 						long startwait = System.currentTimeMillis();//record needed time
 						if(checkOK(end, rob)) {//check
 							okcount ++;//ok button detected
 							if(okcount >= okcountmin) {
 								Main.get().ui.info("OK-button detected!");
-								System.out.println("OK-Button-detected!");
 								skipbattle = true;
 								break;
 							}
@@ -167,9 +165,9 @@ public class Clicker implements Runnable{
 			clickL(rob, cardslots[card]);//click on the card slot
 			sleep(450);//lets Teamviewer transmit the data to the phone and let the phone some time zto sumbit the data to supercell.
 			if(playout != null)//a specified playout spot
-				clickL(rob, playout);//click on the playout location
+				clickL(rob, playout.add(new Point(randomness)));//click on the playout location
 			else 
-				clickL(rob, battle);//non specified playout spot (the battle start button is a good position to play out cards)
+				clickL(rob, battle.add(new Point(randomness)));//non specified playout spot (the battle start button is a good position to play out cards)
 		}
 	}
 
@@ -221,6 +219,10 @@ public class Clicker implements Runnable{
 		autoplay = a;
 	}
 
+	public void setRandmones(int rand) {
+		randomness = rand;
+	}
+	
 	public boolean bothset() {
 		return (end != null & battle != null);
 	}

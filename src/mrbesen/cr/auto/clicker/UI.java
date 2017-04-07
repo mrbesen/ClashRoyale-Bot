@@ -20,51 +20,61 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public class UI implements ActionListener, ChangeListener{
+import com.sun.istack.internal.Nullable;
 
-	JFrame frame = new JFrame("Clash Royale Bot · by MrBesen");;
+public class UI implements ActionListener {
 
-	JPanel root = new JPanel();
-	JPanel top = new JPanel();
-	JPanel bottom = new JPanel();
+	private boolean isSelectionRunning = false; //true if an selection Thread is working, 
+	
+	private JFrame frame = new JFrame("Clash Royale Bot · by MrBesen");;
+
+	private JPanel root = new JPanel();
+	private JPanel top = new JPanel();
+	private JPanel bottom = new JPanel();
 	//JPanel slider = new JPanel();
 
-	JMenuBar menubar = new JMenuBar();
-	JMenu file_ = new JMenu("File");
-	JMenuItem load = new JMenuItem();
-	JMenuItem save = new JMenuItem();
-	
-	JCheckBox autoplay = new JCheckBox("AutoPlay");
-	JCheckBox doubleplace = new JCheckBox("DoublePlace");
+	private JMenuBar menubar = new JMenuBar();
+	private JMenu file_ = new JMenu("File");
+	private JMenuItem load = new JMenuItem();
+	private JMenuItem save = new JMenuItem();
 
-	PosSelector[] posselctors = {
+	private AutoPlayBox autoplay = new AutoPlayBox();
+	private JCheckBox doubleplace = new JCheckBox("DoublePlace");
+
+	private PosSelector[] posselctors = {
 			new PosSelector(this, "Battle",true, 4),
 			new PosSelector(this, "End Battle",true, 5),
 			new PosSelector(this, "Card1",false, 0),
 			new PosSelector(this, "Card2",false, 1),
 			new PosSelector(this, "Card3",false, 2),
 			new PosSelector(this, "Card4", false, 3),
-			new PosSelector(this, "Playout", false, 6)//,
-			//new PosSelector(this, "Top Left", false, 7)
+			new PosSelector(this, "Playout", false, 6)
 	};
 
-	JButton skip = new JButton("SKIP"); // the button, to skip waiting
-	JButton start = new JButton("START");
-	JButton exit = new JButton("EXIT");
+	private JButton skip = new JButton("SKIP"); // the button, to skip waiting
+	private JButton start = new JButton("START");
+	private JButton exit = new JButton("EXIT");
 
-	JLabel info = new JLabel("Define positions, to start.");
+	private JLabel info = new JLabel("Define positions, to start.");
 
-	//JSlider truppenwait = new JSlider(JSlider.HORIZONTAL, 1, 300, 180);
-	//JLabel wait = new JLabel("Waittime between playouts: 18.0");
-	
-	Slider[] slider = {
-			new Slider("Waittime: ","s", 1,300,180,-1, this, false),
-			new Slider("Radius of Placement: ","px",0,40,15,0,this,false)
+	private Slider[] slider = {
+			new Slider("Waittime: ","s", 1,300,180,-1, null, new Updater() {
+				@Override
+				public void update(int nummber) {
+					bot.setWait(nummber);
+				}
+			}, false),
+			new Slider("Radius of Placement: ","px",0,40,15,0, null, new Updater() {
+				@Override
+				public void update(int nummber) {
+					bot.setRandmones(nummber);
+				}
+			},false)
 	};
-	
+
 	Clicker bot = new Clicker();
 
-	File file = new File(".profile");
+	private File file = new File(".profile");
 
 	public UI() {
 		Main.get().ui = this;
@@ -87,38 +97,30 @@ public class UI implements ActionListener, ChangeListener{
 
 		doubleplace.setSelected(true);
 		doubleplace.setEnabled(false);
-		
-//		slider[0].setEnabled(false);
-		
+
 		skip.addActionListener(this);
 		start.addActionListener(this);
 		exit.addActionListener(this);
-		autoplay.addActionListener(this);
 		doubleplace.addActionListener(this);
-		//truppenwait.addChangeListener(this);
-		
+
 		for(PosSelector poss : posselctors) {
 			top.add(poss.button);
 		}
-		
+
 		bottom.add(start);
 		bottom.add(skip);
 		bottom.add(exit);
 		bottom.add(autoplay);
 		bottom.add(doubleplace);
 		bottom.add(info);
-		
-		//slider.add(truppenwait);
-		//slider.add(wait);
-		
-		
+
 		root.add(top);
 		root.add(bottom);
-//		root.add(slider);
+		
 		for(Slider s : slider) {
 			root.add(s);
 		}
-		
+
 		frame.add(root);
 
 		frame.setVisible(true);
@@ -133,7 +135,8 @@ public class UI implements ActionListener, ChangeListener{
 			//check for the Posselectors
 			for(PosSelector poss : posselctors) {
 				if(poss.button.equals(srcb)) {
-					new Thread(poss, "PositionSelector").start();
+					if(!isSelectionRunning)
+						new Thread(poss, "PositionSelector").start();
 					break;
 				}
 			}
@@ -166,7 +169,7 @@ public class UI implements ActionListener, ChangeListener{
 			}
 		} else if(src instanceof JCheckBox) {
 			JCheckBox srcb = (JCheckBox) src;
-			if(srcb.equals(autoplay)) {
+			/*		if(srcb.equals(autoplay)) {
 				bot.setAutoPlay(srcb.isSelected());
 				if(srcb.isSelected()) {
 					slider[0].setEnabled(true);
@@ -175,7 +178,8 @@ public class UI implements ActionListener, ChangeListener{
 					slider[0].setEnabled(false);
 					doubleplace.setEnabled(false);
 				}
-			} else if(srcb.equals(doubleplace)) {
+			} else */
+			if(srcb.equals(doubleplace)) {
 				bot.setDoublePlay(srcb.isSelected());
 				if(srcb.isSelected()) {//*2
 					slider[0].setValue(slider[0].getValue()*2);
@@ -186,17 +190,6 @@ public class UI implements ActionListener, ChangeListener{
 		}
 	}
 
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		Object o = e.getSource();
-		if(o instanceof JSlider) {
-			JSlider slider = (JSlider) o;
-			if(slider.equals(this.slider[0])) {
-				bot.setWait(slider.getValue());
-			}
-		}
-	}
-	
 	private void load(boolean info) {
 		if(file.exists()) {
 			try { 
@@ -205,20 +198,20 @@ public class UI implements ActionListener, ChangeListener{
 					String split[] = s.nextLine().split(" ",2);
 					if(!split[1].equals("null")) {
 						int num = Integer.parseInt(split[0]);
-						if(num > 100) {
+						if(num > 100) {//special settings (slider / checkboxes)
 							if(num == 101) {//truppenwait
 								int wait = Integer.parseInt(split[1]);
 								slider[0].setValue(wait);
 							} else if(num == 102) { // double playout
 								boolean dp = Boolean.parseBoolean(split[1]);
-								if(dp) {
-									autoplay.setSelected(true);
-									doubleplace.setEnabled(true);
-									slider[0].setEnabled(true);
-								}
+								if(dp)
+									autoplay.setSelected(true);	
 								doubleplace.setSelected(dp);
+								bot.setDoublePlay(dp);
+							} else if(num == 103) {
+								slider[1].setValue(Integer.parseInt(split[1]));
 							}
-						} else 
+						} else //standard Point Obj.
 							bot.set(new Point(split[1]), num);
 					}
 				}
@@ -242,7 +235,7 @@ public class UI implements ActionListener, ChangeListener{
 				file.createNewFile();
 
 			FileWriter fw = new FileWriter(file);
-			fw.write(bot.serialize()+"\n101 "+ slider[0].getValue() + "\n102 " + doubleplace.isSelected());
+			fw.write(bot.serialize()+"\n101 "+ slider[0].getValue() + "\n102 " + doubleplace.isSelected()+"\n103" + slider[1].getValue());
 			fw.flush();
 			fw.close();
 
@@ -269,12 +262,48 @@ public class UI implements ActionListener, ChangeListener{
 		info.setText(a);
 	}
 
+	public void setPositionDone() {
+		isSelectionRunning = false;
+	}
+	
+	public interface Updater {
+		public void update(int nummber);
+	}
+
+	public class AutoPlayBox extends JCheckBox implements ActionListener {//AutoPlayCheck Box (Extra Object because some updateing problems occour)
+		private static final long serialVersionUID = 8957130982898848436L;
+
+		public AutoPlayBox() {
+			super("AutoPlay");
+			addActionListener(this);
+		}
+
+		@Override
+		public void setSelected(boolean b) {
+			super.setSelected(b);
+			update(b);
+		}
+
+		public void update(boolean b) {
+			doubleplace.setEnabled(b);
+			slider[0].setEnabled(b);
+			slider[1].setEnabled(b);
+			bot.setAutoPlay(b);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			update(this.isSelected());
+		}
+	}
+
 	public class Slider extends JPanel implements ChangeListener{
 		private static final long serialVersionUID = 1L;
 		private JSlider slider;
 		private JLabel label;
-		
+
 		private ChangeListener listener;
+		private Updater updater;
 		private String prefix = "", sufix = "";
 		private int offset;
 		/**
@@ -285,7 +314,7 @@ public class UI implements ActionListener, ChangeListener{
 		 * @param startvalue inital value
 		 * @param komma 10^x offset for komma digits
 		 */
-		public Slider(String prefix, String sufix, int minvalue, int maxvalue, int startvalue, int komma, ChangeListener cl, boolean enabled) {
+		public Slider(String prefix, String sufix, int minvalue, int maxvalue, int startvalue, int komma, @Nullable ChangeListener cl,@Nullable Updater upd, boolean enabled) {//ChangeListener or Updater could be Null!
 			slider = new JSlider(minvalue, maxvalue, startvalue);
 			slider.addChangeListener(this);
 			if(prefix != null)
@@ -298,13 +327,14 @@ public class UI implements ActionListener, ChangeListener{
 			add(slider);
 			add(label);
 			listener = cl;
+			updater = upd;
 			slider.setEnabled(enabled);
 		}
 		
 		public int getValue() {
 			return slider.getValue();
 		}
-		
+
 		public void setValue(int val) {
 			slider.setValue(val);
 		}
@@ -315,10 +345,6 @@ public class UI implements ActionListener, ChangeListener{
 			return prefix + (BigDecimal.valueOf(Math.pow(10, offset)).multiply(BigDecimal.valueOf(slider.getValue()))) + sufix;
 		}
 		
-		/*public void setChangeListener(ChangeListener l) { //not required anymore
-			listener = l;
-		}*/
-		
 		@Override
 		public void setEnabled(boolean enabled) {
 			slider.setEnabled(enabled);
@@ -327,7 +353,10 @@ public class UI implements ActionListener, ChangeListener{
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			label.setText(getLabelText());//update info
-			listener.stateChanged(e);//forward Event
+			if(listener != null)
+				listener.stateChanged(e);//forward Event
+			if(updater != null)
+				updater.update(slider.getValue());
 		}
 	}
 }
