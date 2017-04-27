@@ -18,10 +18,10 @@ public class Clicker implements Runnable{
 	private boolean skipbattle = false;
 	private Thread thread;
 
-	private Point top_left;
-
 	private Point battle;
 	private Point end;
+	
+	private Point arena_switch;
 
 	private Point[] cardslots = new Point[4]; 
 	private Point playout;
@@ -142,7 +142,12 @@ public class Clicker implements Runnable{
 				inbattle = false;
 				clickL(rob, end);//ok button
 				Main.get().ui.info("Battle ended.");
-				sleep(10000);//10 sec-loading screen
+				sleep(12000);//10 sec-loading screen
+				//checken, ob Arena wechsel pop-up
+				if(checkOK(arena_switch, rob)) {
+					clickL(rob, arena_switch);
+					sleep(5000);
+				}
 			}
 		} catch (AWTException e) {
 			e.printStackTrace();
@@ -183,7 +188,7 @@ public class Clicker implements Runnable{
 		} else if(num == 6)
 			playout = a;
 		else if(num == 7)
-			top_left = a;
+			arena_switch = a;
 	}
 
 	public boolean isSet(int num) {
@@ -202,7 +207,7 @@ public class Clicker implements Runnable{
 		else if(num == 6)
 			return playout;
 		else if(num == 7)
-			return top_left;
+			return arena_switch;
 
 		return null;
 	}
