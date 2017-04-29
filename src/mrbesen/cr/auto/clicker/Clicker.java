@@ -10,8 +10,6 @@ import java.awt.image.BufferedImage;
 
 public class Clicker implements Runnable{
 
-	private int okcountmin = 2;//min count of ok button detections in a row, to trigger a new round.
-	
 	private boolean running = false;
 	private boolean should_run = false;
 	private boolean inbattle = false;
@@ -20,7 +18,7 @@ public class Clicker implements Runnable{
 
 	private Point battle;
 	private Point end;
-	
+
 	private Point arena_switch;
 
 	private Point[] cardslots = new Point[4]; 
@@ -85,76 +83,67 @@ public class Clicker implements Runnable{
 				float modifier = 1;
 				long start = System.currentTimeMillis();
 				long lastwait = start;//actions like moving mouse and do stuff gets messured and subtracted of the wait's
-				int okcount = 0;
 				while( ((System.currentTimeMillis() - start) / 6000) < 41 & should_run & !skipbattle) {
 
 					//check für ok-button
 					if(round(start) > 20) {//game is older then 20 seconds
 						if(checkOK(end, rob)) {//check
-							okcount ++;//ok button detected
-							if(okcount >= okcountmin) {
-								Main.get().ui.info("OK-button detected!");
-//								System.out.println("OK-Button-detected!");
-								skipbattle = true;
-								break;
-							}
-						} else 
-							okcount = 0;//reset
-					}
-
-					//try to play out a card
-					if(autoplay) {
-						playout(card, rob);//try to play a card
-						card = (card +1) % 4;//move card pointer to the next
-						if(doubleplayout) {
-							sleep(750);
-							playout(card, rob);
-							card = (card +1) % 4;//next
+							Main.get().ui.info("OK-button detected!");
+							//								System.out.println("OK-Button-detected!");
+							skipbattle = true;
+							break;
 						}
 					}
+				}
 
-					if(round(start) >= 115) //game older than 2 minutes -> speed the playout process up!
-						modifier = 2;
-					else if(round(start) >= (115 - (truppenwait / 2))) //remove half waittime and do half speed.
-						modifier = 1.5f;
-					//        eingestellter wert (0.1 sec) ggf. durch 2 teilen   vergangene zeit abziehen (zeit fürs setztem der letzten truppen)   
-					int waittime = ( (int) (((truppenwait * 100) / modifier) - (System.currentTimeMillis()- lastwait)) );//how long to wait?
-					Main.get().ui.info("Waiting for: " + waittime);
-					while (waittime > 1500 & !skipbattle) {//check for the ok-button every 3 seconds
-						long startwait = System.currentTimeMillis();//record needed time
-						if(checkOK(end, rob)) {//check
-							okcount ++;//ok button detected
-							if(okcount >= okcountmin) {
-								Main.get().ui.info("OK-button detected!");
-								skipbattle = true;
-								break;
-							}
-						} else 
-							okcount = 0;//reset
-						sleep((int) (1500 - (System.currentTimeMillis() - startwait)));//sleep the rest of 3 seconds, that was not gone for checking
-						waittime = (int) (waittime - (System.currentTimeMillis() - startwait));//calculate waittime that is left
+				//try to play out a card
+				if(autoplay) {
+					playout(card, rob);//try to play a card
+					card = (card +1) % 4;//move card pointer to the next
+					if(doubleplayout) {
+						sleep(750);
+						playout(card, rob);
+						card = (card +1) % 4;//next
 					}
-					sleep(waittime);//wait
+				}
 
-					lastwait = System.currentTimeMillis();//restart the messurement of time used by the actions
+				if(round(start) >= 115) //game older than 2 minutes -> speed the playout process up!
+					modifier = 2;
+				else if(round(start) >= (115 - (truppenwait / 2))) //remove half waittime and do half speed.
+					modifier = 1.5f;
+				//        eingestellter wert (0.1 sec) ggf. durch 2 teilen   vergangene zeit abziehen (zeit fürs setztem der letzten truppen)   
+				int waittime = ( (int) (((truppenwait * 100) / modifier) - (System.currentTimeMillis()- lastwait)) );//how long to wait?
+				Main.get().ui.info("Waiting for: " + waittime);
+				while (waittime > 1500 & !skipbattle) {//check for the ok-button every 3 seconds
+					long startwait = System.currentTimeMillis();//record needed time
+					if(checkOK(end, rob)) {//check
+						Main.get().ui.info("OK-button detected!");
+						skipbattle = true;
+						break;
+					} 
+					sleep((int) (1500 - (System.currentTimeMillis() - startwait)));//sleep the rest of 3 seconds, that was not gone for checking
+					waittime = (int) (waittime - (System.currentTimeMillis() - startwait));//calculate waittime that is left
 				}
-				skipbattle = false;
-				inbattle = false;
-				clickL(rob, end);//ok button
-				Main.get().ui.info("Battle ended.");
-				sleep(12000);//10 sec-loading screen
-				//checken, ob Arena wechsel pop-up
-				if(checkOK(arena_switch, rob)) {
-					clickL(rob, arena_switch);
-					sleep(5000);
-				}
+				sleep(waittime);//wait
+
+				lastwait = System.currentTimeMillis();//restart the messurement of time used by the actions
+			}
+			skipbattle = false;
+			inbattle = false;
+			clickL(rob, end);//ok button
+			Main.get().ui.info("Battle ended.");
+			sleep(9000);//9 sec-loading screen
+			//checken, ob Arena wechsel pop-up
+			while(checkOK(arena_switch, rob)) {
+				clickL(rob, arena_switch);
+				sleep(2000);
 			}
 		} catch (AWTException e) {
 			e.printStackTrace();
 		}
 		running= false;//remove the running flag
 	}
-	
+
 	private float round(long start) {//returns how old the round is in 0.1 seconds
 		return ((System.currentTimeMillis() - start) / 1000);
 	}
@@ -227,7 +216,7 @@ public class Clicker implements Runnable{
 	public void setRandmones(int rand) {
 		randomness = rand;
 	}
-	
+
 	public boolean bothset() {
 		return (end != null & battle != null);
 	}
@@ -273,17 +262,17 @@ public class Clicker implements Runnable{
 			for (int y = 0; y < 20; y++) {
 				int color = img.getRGB(x, y);
 				int red = (color & 0x00ff0000) >> 16;
-				int green = (color & 0x0000ff00) >> 8;
-				int blue = color & 0x000000ff;
-				double distance = Math.sqrt(Math.pow((blue - goalcolor.getBlue()), 2)
-						+ Math.pow((red - goalcolor.getRed()), 2) + Math.pow((green - goalcolor.getGreen()), 2));//calculate the distance between the goalcolor and the test color
-				// System.out.println("distance: " + distance);
-				if (distance < 25)
-					count++;
+			int green = (color & 0x0000ff00) >> 8;
+		int blue = color & 0x000000ff;
+		double distance = Math.sqrt(Math.pow((blue - goalcolor.getBlue()), 2)
+				+ Math.pow((red - goalcolor.getRed()), 2) + Math.pow((green - goalcolor.getGreen()), 2));//calculate the distance between the goalcolor and the test color
+		// System.out.println("distance: " + distance);
+		if (distance < 25)
+			count++;
 			}
 		}
 
-//		System.out.println("checking ok takes: " + (System.currentTimeMillis() - start));//some performance checking
+		//		System.out.println("checking ok takes: " + (System.currentTimeMillis() - start));//some performance checking
 		return count > 70;
 	}
 
@@ -300,6 +289,6 @@ public class Clicker implements Runnable{
 				ps = p.serialize();
 			out += i + " " +  ps + "\n";
 		}
-		return out.substring(0, out.length()-1);
+		return out.substring(0, out.length()-1);//remove last \n
 	}
 }
