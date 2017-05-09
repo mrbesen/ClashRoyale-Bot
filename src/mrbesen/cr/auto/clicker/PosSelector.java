@@ -25,7 +25,7 @@ public class PosSelector implements Runnable {
 				ui.info(i + "");
 				Thread.sleep(1000);
 			}
-		} catch(InterruptedException e) {;}
+		} catch(InterruptedException e) {}
 		ui.bot.set(ui.bot.getMouse(), num);//get and save the position
 		ui.info("Position saved!");
 		green();

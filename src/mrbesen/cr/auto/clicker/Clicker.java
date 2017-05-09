@@ -23,6 +23,10 @@ public class Clicker implements Runnable{
 
 	private Point[] cardslots = new Point[4]; 
 	private Point playout;
+
+	private Color ok_button = new Color(85, 170, 254);
+	private Color arena_view = new Color(85, 170, 254);//<-not the correct color!
+
 	private boolean autoplay;
 	private boolean doubleplayout = true;
 	private int truppenwait = 180;
@@ -87,56 +91,55 @@ public class Clicker implements Runnable{
 
 					//check für ok-button
 					if(round(start) > 20) {//game is older then 20 seconds
-						if(checkOK(end, rob)) {//check
+						if(checkOK(end, rob,ok_button)) {//check
 							Main.get().ui.info("OK-button detected!");
-							//								System.out.println("OK-Button-detected!");
 							skipbattle = true;
 							break;
 						}
 					}
-				}
 
-				//try to play out a card
-				if(autoplay) {
-					playout(card, rob);//try to play a card
-					card = (card +1) % 4;//move card pointer to the next
-					if(doubleplayout) {
-						sleep(750);
-						playout(card, rob);
-						card = (card +1) % 4;//next
+					//try to play out a card
+					if(autoplay) {
+						playout(card, rob);//try to play a card
+						card = (card +1) % 4;//move card pointer to the next
+						if(doubleplayout) {
+							sleep(750);
+							playout(card, rob);
+							card = (card +1) % 4;//next
+						}
 					}
-				}
 
-				if(round(start) >= 115) //game older than 2 minutes -> speed the playout process up!
-					modifier = 2;
-				else if(round(start) >= (115 - (truppenwait / 2))) //remove half waittime and do half speed.
-					modifier = 1.5f;
-				//        eingestellter wert (0.1 sec) ggf. durch 2 teilen   vergangene zeit abziehen (zeit fürs setztem der letzten truppen)   
-				int waittime = ( (int) (((truppenwait * 100) / modifier) - (System.currentTimeMillis()- lastwait)) );//how long to wait?
-				Main.get().ui.info("Waiting for: " + waittime);
-				while (waittime > 1500 & !skipbattle) {//check for the ok-button every 3 seconds
-					long startwait = System.currentTimeMillis();//record needed time
-					if(checkOK(end, rob)) {//check
-						Main.get().ui.info("OK-button detected!");
-						skipbattle = true;
-						break;
-					} 
-					sleep((int) (1500 - (System.currentTimeMillis() - startwait)));//sleep the rest of 3 seconds, that was not gone for checking
-					waittime = (int) (waittime - (System.currentTimeMillis() - startwait));//calculate waittime that is left
-				}
-				sleep(waittime);//wait
+					if(round(start) >= 115) //game older than 2 minutes -> speed the playout process up!
+						modifier = 2;
+					else if(round(start) >= (115 - (truppenwait / 2))) //remove half waittime and do half speed.
+						modifier = 1.5f;
+					//        eingestellter wert (0.1 sec) ggf. durch 2 teilen   vergangene zeit abziehen (zeit fürs setztem der letzten truppen)   
+					int waittime = ( (int) (((truppenwait * 100) / modifier) - (System.currentTimeMillis()- lastwait)) );//how long to wait?
+					Main.get().ui.info("Waiting for: " + waittime);
+					while (waittime > 1500 & !skipbattle) {//check for the ok-button every 3 seconds
+						long startwait = System.currentTimeMillis();//record needed time
+						if(checkOK(end, rob, ok_button)) {//check
+							Main.get().ui.info("OK-button detected!");
+							skipbattle = true;
+							break;
+						} 
+						sleep((int) (1500 - (System.currentTimeMillis() - startwait)));//sleep the rest of 3 seconds, that was not gone for checking
+						waittime = (int) (waittime - (System.currentTimeMillis() - startwait));//calculate waittime that is left
+					}
+					sleep(waittime);//wait
 
-				lastwait = System.currentTimeMillis();//restart the messurement of time used by the actions
-			}
-			skipbattle = false;
-			inbattle = false;
-			clickL(rob, end);//ok button
-			Main.get().ui.info("Battle ended.");
-			sleep(9000);//9 sec-loading screen
-			//checken, ob Arena wechsel pop-up
-			while(checkOK(arena_switch, rob)) {
-				clickL(rob, arena_switch);
-				sleep(2000);
+					lastwait = System.currentTimeMillis();//restart the messurement of time used by the actions
+				}
+				skipbattle = false;
+				inbattle = false;
+				clickL(rob, end);//ok button
+				Main.get().ui.info("Battle ended.");
+				sleep(9000);//9 sec-loading screen
+				//checken, ob Arena wechsel pop-up
+				while(checkOK(arena_switch, rob,arena_view)) {
+					clickL(rob, arena_switch);
+					sleep(2000);
+				}
 			}
 		} catch (AWTException e) {
 			e.printStackTrace();
@@ -253,10 +256,9 @@ public class Clicker implements Runnable{
 	 * @param bot the Robot object to use
 	 * @return true, if there are more then 70px alike enough
 	 */
-	private boolean checkOK(Point p, Robot bot) {
+	private boolean checkOK(Point p, Robot bot, Color goalcolor) {
 		//long start = System.currentTimeMillis();
 		int count = 0;
-		Color goalcolor = new Color(85, 170, 254);//the wanted color
 		BufferedImage img = bot.createScreenCapture(new Rectangle(p.x-10, p.y-10, 20, 20));//smile
 		for (int x = 0; x < 20; x++) {
 			for (int y = 0; y < 20; y++) {
@@ -266,7 +268,6 @@ public class Clicker implements Runnable{
 		int blue = color & 0x000000ff;
 		double distance = Math.sqrt(Math.pow((blue - goalcolor.getBlue()), 2)
 				+ Math.pow((red - goalcolor.getRed()), 2) + Math.pow((green - goalcolor.getGreen()), 2));//calculate the distance between the goalcolor and the test color
-		// System.out.println("distance: " + distance);
 		if (distance < 25)
 			count++;
 			}
@@ -289,6 +290,26 @@ public class Clicker implements Runnable{
 				ps = p.serialize();
 			out += i + " " +  ps + "\n";
 		}
-		return out.substring(0, out.length()-1);//remove last \n
+		out = out + "104 " + arena_view.getRed() + " " + arena_view.getGreen() + " " + arena_view.getBlue();
+		out = out + "\n105 " + ok_button.getRed() + " " + ok_button.getGreen() + " " + ok_button.getBlue();
+		return out ;
+	}
+
+	
+	/**
+	 * Set the avg Color of an Button
+	 * @param c Color
+	 * @param colornum nummber (0=ok-button, 1=arena_view-button)
+	 */
+	public void setColor(Color c, int colornum) {
+		switch(colornum) {
+		case 0:
+			ok_button = c;
+			break;
+		case 1:
+			arena_view = c;
+			break;
+		}
+		System.out.println(colornum + ": "+c.getRed() + " " + c.getGreen() + " " + c.getBlue());
 	}
 }

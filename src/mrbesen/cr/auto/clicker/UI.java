@@ -1,5 +1,6 @@
 package mrbesen.cr.auto.clicker;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -43,13 +44,13 @@ public class UI implements ActionListener {
 
 	private PosSelector[] posselctors = {
 			new PosSelector(this, "Battle",true, 4),
-			new PosSelector(this, "End Battle",true, 5),
+			new PosColSelector(this, "End Battle",true, 5,0),
 			new PosSelector(this, "Card1",false, 0),
 			new PosSelector(this, "Card2",false, 1),
 			new PosSelector(this, "Card3",false, 2),
 			new PosSelector(this, "Card4", false, 3),
 			new PosSelector(this, "Playout", false, 6),
-			new PosSelector(this, "Arena View", false, 7)
+			new PosColSelector(this, "Arena View", false, 7,1)
 	};
 
 	private JButton skip = new JButton("SKIP"); // the button, to skip waiting
@@ -81,7 +82,7 @@ public class UI implements ActionListener {
 		Main.get().ui = this;
 		//init screen
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		frame.setSize(620, 180);
+		frame.setSize(730, 180);
 
 		save.setText("Save");
 		save.addActionListener(this);
@@ -196,7 +197,7 @@ public class UI implements ActionListener {
 			try { 
 				Scanner s = new Scanner(file);
 				while(s.hasNextLine()) {
-					String split[] = s.nextLine().split(" ",2);
+					String split[] = s.nextLine().split(" ");
 					if(!split[1].equals("null")) {
 						int num = Integer.parseInt(split[0]);
 						if(num > 100) {//special settings (slider / checkboxes)
@@ -211,6 +212,12 @@ public class UI implements ActionListener {
 								bot.setDoublePlay(dp);
 							} else if(num == 103) {
 								slider[1].setValue(Integer.parseInt(split[1]));
+							} else if(num == 104) {
+								Color c = new Color(Integer.parseInt(split[1]), Integer.parseInt(split[2]), Integer.parseInt(split[3]));
+								bot.setColor(c, 1);
+							} else if(num == 105) {
+								Color c = new Color(Integer.parseInt(split[1]), Integer.parseInt(split[2]), Integer.parseInt(split[3]));
+								bot.setColor(c, 0);
 							}
 						} else //standard Point Obj.
 							bot.set(new Point(split[1]), num);
@@ -236,7 +243,7 @@ public class UI implements ActionListener {
 				file.createNewFile();
 
 			FileWriter fw = new FileWriter(file);
-			fw.write(bot.serialize()+"\n101 "+ slider[0].getValue() + "\n102 " + doubleplace.isSelected()+"\n103" + slider[1].getValue());
+			fw.write(bot.serialize()+"\n101 "+ slider[0].getValue() + "\n102 " + doubleplace.isSelected()+"\n103 " + slider[1].getValue());
 			fw.flush();
 			fw.close();
 
