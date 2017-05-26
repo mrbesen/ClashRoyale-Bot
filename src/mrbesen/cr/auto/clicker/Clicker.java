@@ -31,6 +31,8 @@ public class Clicker implements Runnable{
 	private boolean doubleplayout = true;
 	private int truppenwait = 180;
 	private int randomness = 15;
+	
+	private int mincolordistance = 35;
 
 	private void sleep( int ms) {
 		if(skipbattle)
@@ -137,6 +139,7 @@ public class Clicker implements Runnable{
 				sleep(9000);//9 sec-loading screen
 				//checken, ob Arena wechsel pop-up
 				while(checkOK(arena_switch, rob,arena_view)) {
+					System.out.println("Arena found, clicking");
 					clickL(rob, arena_switch);
 					sleep(2000);
 				}
@@ -264,16 +267,16 @@ public class Clicker implements Runnable{
 			for (int y = 0; y < 20; y++) {
 				int color = img.getRGB(x, y);
 				int red = (color & 0x00ff0000) >> 16;
-			int green = (color & 0x0000ff00) >> 8;
-		int blue = color & 0x000000ff;
-		double distance = Math.sqrt(Math.pow((blue - goalcolor.getBlue()), 2)
+				int green = (color & 0x0000ff00) >> 8;
+				int blue = color & 0x000000ff;
+				double distance = Math.sqrt(Math.pow((blue - goalcolor.getBlue()), 2)
 				+ Math.pow((red - goalcolor.getRed()), 2) + Math.pow((green - goalcolor.getGreen()), 2));//calculate the distance between the goalcolor and the test color
-		if (distance < 25)
+		if (distance < mincolordistance)
 			count++;
 			}
 		}
 
-		//		System.out.println("checking ok takes: " + (System.currentTimeMillis() - start));//some performance checking
+//		System.out.println("counts: " + count);//some performance checking
 		return count > 70;
 	}
 
@@ -301,7 +304,7 @@ public class Clicker implements Runnable{
 	 * @param c Color
 	 * @param colornum nummber (0=ok-button, 1=arena_view-button)
 	 */
-	public void setColor(Color c, int colornum) {
+	public void setColor(Color c, int colornum, int minimumdistance) {
 		switch(colornum) {
 		case 0:
 			ok_button = c;
@@ -310,6 +313,8 @@ public class Clicker implements Runnable{
 			arena_view = c;
 			break;
 		}
+		if(mincolordistance < minimumdistance)
+			mincolordistance = minimumdistance;
 		System.out.println(colornum + ": "+c.getRed() + " " + c.getGreen() + " " + c.getBlue());
 	}
 }

@@ -5,6 +5,9 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.image.BufferedImage;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class PosColSelector extends PosSelector {
 
@@ -40,7 +43,40 @@ public class PosColSelector extends PosSelector {
 			blue /= count;
 			green /= count;
 			Color c = new Color(red, green, blue);
-			ui.bot.setColor(c,colornum);
+			
+			//calculate distances:
+			List<Integer> dist = new LinkedList<Integer>();
+			for (int x = 0; x < 20; x++) {
+				for (int y = 0; y < 20; y++) {
+					int color = img.getRGB(x, y);
+					int redf = (color & 0x00ff0000) >> 16;
+					int greenf = (color & 0x0000ff00) >> 8;
+					int bluef = color & 0x000000ff;
+					double distance = Math.sqrt(Math.pow((bluef - c.getBlue()), 2)
+					+ Math.pow((redf - c.getRed()), 2) + Math.pow((greenf - c.getGreen()), 2));
+					dist.add((int) distance);
+//					System.out.println(distance);
+				}
+			}
+			
+			dist.sort(new Comparator<Integer>() {
+				@Override
+				public int compare(Integer o1, Integer o2) {
+					if(o1 < o2)
+						return -1;
+					if(o1== o2)
+						return 0;
+					if(o1 > o2)
+						return 1;
+					return 0;
+				}
+			});
+			
+			int miniumdistance = dist.get(150);//at least the first 100 tests should fit
+//			int maximumdistance = dist.get(dist.size()-1);
+			System.out.println("minimum distance: " + miniumdistance );
+			ui.bot.setColor(c,colornum, miniumdistance);
+			ui.bot.set(p, num);
 		} catch(AWTException e) {
 			e.printStackTrace();
 		}

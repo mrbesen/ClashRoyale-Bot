@@ -214,10 +214,10 @@ public class UI implements ActionListener {
 								slider[1].setValue(Integer.parseInt(split[1]));
 							} else if(num == 104) {
 								Color c = new Color(Integer.parseInt(split[1]), Integer.parseInt(split[2]), Integer.parseInt(split[3]));
-								bot.setColor(c, 1);
+								bot.setColor(c, 1,35);
 							} else if(num == 105) {
 								Color c = new Color(Integer.parseInt(split[1]), Integer.parseInt(split[2]), Integer.parseInt(split[3]));
-								bot.setColor(c, 0);
+								bot.setColor(c, 0,35);
 							}
 						} else //standard Point Obj.
 							bot.set(new Point(split[1]), num);
