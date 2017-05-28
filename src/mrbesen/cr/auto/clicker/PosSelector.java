@@ -11,6 +11,10 @@ public class PosSelector implements Runnable {
 	UI ui;
 	private boolean required;
 	
+	public boolean isRequired() {
+		return required;
+	}
+
 	public PosSelector(UI ui, String text, boolean required, int num) {
 		this.ui = ui; this.required = required;this.num = num;
 		button = new JButton(text);
