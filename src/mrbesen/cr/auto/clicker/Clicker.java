@@ -6,6 +6,7 @@ import java.awt.MouseInfo;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
 public class Clicker implements Runnable{
@@ -32,8 +33,13 @@ public class Clicker implements Runnable{
 	private int truppenwait = 180;
 	private int randomness = 15;
 	private boolean paused = false;
-	
+	private boolean backfocus = false;
+	private final int waittime = 50;//time between mouse teleports and clicks
+
 	private int mincolordistance = 35;
+
+	OSType os;
+
 
 	private void sleep( int ms) {
 		if(skipbattle)
@@ -78,6 +84,18 @@ public class Clicker implements Runnable{
 	@Override
 	public void run() {
 		sleep(1000);//chill ma
+
+		//determine os
+		String oss = System.getProperty("os.name").toLowerCase();
+		if(oss.contains("nix") | oss.contains("nux") | oss.contains("aix")) 
+			os = OSType.Linux;
+		else if(oss.contains("win"))
+			os = OSType.Windows;
+		else if(oss.contains("mac")) 
+			os = OSType.OSX;
+		else 
+			Main.get().ui.info("OS not supported for backfocus: " + oss);
+
 		int card = 0;
 		try {
 			Robot rob = new Robot();
@@ -86,6 +104,7 @@ public class Clicker implements Runnable{
 				clickL(rob, battle);//smash the start button
 				sleep(1000);
 				clickL(rob, battle);//press start again (if there is an alert poping up)
+				backfocus(rob);
 				//battle is starting up
 				sleep(9000);//wait for the battle to start (loading screen)
 				Main.get().ui.info("Battle started.");
@@ -109,10 +128,11 @@ public class Clicker implements Runnable{
 						playout(card, rob);//try to play a card
 						card = (card +1) % 4;//move card pointer to the next
 						if(doubleplayout) {
-							sleep(750);
+							sleep(waittime * 2);
 							playout(card, rob);
 							card = (card +1) % 4;//next
 						}
+						backfocus(rob);
 					}
 
 					if(round(start) >= 115) //game older than 2 minutes -> speed the playout process up!
@@ -139,12 +159,14 @@ public class Clicker implements Runnable{
 				skipbattle = false;
 				inbattle = false;
 				clickL(rob, end);//ok button
+				backfocus(rob);
 				Main.get().ui.info("Battle ended.");
 				sleep(9000);//9 sec-loading screen
 				//checken, ob Arena wechsel pop-up
 				while(checkOK(arena_switch, rob,arena_view)) {
 					System.out.println("Arena found, clicking");
 					clickL(rob, arena_switch);
+					backfocus(rob);
 					sleep(2000);
 				}
 			}
@@ -167,11 +189,28 @@ public class Clicker implements Runnable{
 		Main.get().ui.info("Playout: " + (card+1));
 		if(cardslots[card] != null) {//card is selectable
 			clickL(rob, cardslots[card]);//click on the card slot
-			sleep(450);//lets Teamviewer transmit the data to the phone and let the phone some time zto sumbit the data to supercell.
+			sleep(waittime);//lets Teamviewer transmit the data to the phone and let the phone some time zto sumbit the data to supercell.
 			if(playout != null)//a specified playout spot
 				clickL(rob, playout.add(new Point(randomness)));//click on the playout location
 			else 
 				clickL(rob, battle.add(new Point(randomness)));//non specified playout spot (the battle start button is a good position to play out cards)
+		}
+	}
+
+	private void backfocus(Robot bot) {
+		if(backfocus) {
+			if(os == OSType.Windows | os == OSType.Linux)
+				bot.keyPress(KeyEvent.VK_ALT);
+			else//osx / unsupported
+				bot.keyPress(KeyEvent.VK_META);
+
+			bot.keyPress(KeyEvent.VK_TAB);
+			sleep(waittime);
+			bot.keyRelease(KeyEvent.VK_TAB);
+			if(os == OSType.Windows | os == OSType.Linux)
+				bot.keyRelease(KeyEvent.VK_ALT);
+			else//osx / unsupported
+				bot.keyRelease(KeyEvent.VK_META);
 		}
 	}
 
@@ -188,6 +227,14 @@ public class Clicker implements Runnable{
 			playout = a;
 		else if(num == 7)
 			arena_switch = a;
+	}
+
+	public boolean isBackfocus() {
+		return backfocus;
+	}
+
+	public void toggleBackfocus() {
+		backfocus = !backfocus;
 	}
 
 	public boolean isSet(int num) {
@@ -245,9 +292,9 @@ public class Clicker implements Runnable{
 
 	private void clickL(Robot b) {//40 ms delay
 		b.mousePress(InputEvent.BUTTON1_MASK);
-		sleep(40);
+		sleep(waittime);
 		b.mouseRelease(InputEvent.BUTTON1_MASK);
-		sleep(10);
+		sleep(waittime);
 	}
 
 	private int getMousex() {
@@ -273,16 +320,16 @@ public class Clicker implements Runnable{
 			for (int y = 0; y < 20; y++) {
 				int color = img.getRGB(x, y);
 				int red = (color & 0x00ff0000) >> 16;
-				int green = (color & 0x0000ff00) >> 8;
-				int blue = color & 0x000000ff;
-				double distance = Math.sqrt(Math.pow((blue - goalcolor.getBlue()), 2)
+			int green = (color & 0x0000ff00) >> 8;
+		int blue = color & 0x000000ff;
+		double distance = Math.sqrt(Math.pow((blue - goalcolor.getBlue()), 2)
 				+ Math.pow((red - goalcolor.getRed()), 2) + Math.pow((green - goalcolor.getGreen()), 2));//calculate the distance between the goalcolor and the test color
 		if (distance < mincolordistance)
 			count++;
 			}
 		}
 
-//		System.out.println("counts: " + count);//some performance checking
+		//		System.out.println("counts: " + count);//some performance checking
 		return count > 70;
 	}
 
@@ -304,7 +351,7 @@ public class Clicker implements Runnable{
 		return out ;
 	}
 
-	
+
 	/**
 	 * Set the avg Color of an Button
 	 * @param c Color
@@ -324,12 +371,19 @@ public class Clicker implements Runnable{
 		System.out.println(colornum + ": "+c.getRed() + " " + c.getGreen() + " " + c.getBlue());
 	}
 
-	
+
 	public boolean isPaused() {
 		return paused;
 	}
 
 	public void setPause(boolean b) {
 		paused = b;
+	}
+
+	private enum OSType {
+		Linux,
+		Windows,
+		OSX,
+		unsupported
 	}
 }

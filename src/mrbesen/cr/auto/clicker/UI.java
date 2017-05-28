@@ -41,6 +41,7 @@ public class UI implements ActionListener {
 
 	private AutoPlayBox autoplay = new AutoPlayBox();
 	private JCheckBox doubleplace = new JCheckBox("DoublePlace");
+	private JCheckBox backfocus = new JCheckBox("BackFocus");
 
 	private PosSelector[] posselctors = {
 			new PosSelector(this, "Battle",true, 4),
@@ -106,6 +107,7 @@ public class UI implements ActionListener {
 		pause.addActionListener(this);
 		exit.addActionListener(this);
 		doubleplace.addActionListener(this);
+		backfocus.addActionListener(this);
 
 		for(PosSelector poss : posselctors) {
 			top.add(poss.button);
@@ -117,10 +119,12 @@ public class UI implements ActionListener {
 		bottom.add(exit);
 		bottom.add(autoplay);
 		bottom.add(doubleplace);
-		bottom.add(info);
+		bottom.add(backfocus);
 
 		root.add(top);
 		root.add(bottom);
+		
+		root.add(info);
 		
 		for(Slider s : slider) {
 			root.add(s);
@@ -190,6 +194,8 @@ public class UI implements ActionListener {
 				} else {// /2
 					slider[0].setValue(slider[0].getValue()/2);
 				}
+			} else if(srcb.equals(backfocus)) {
+				bot.toggleBackfocus();
 			}
 		}
 	}
@@ -257,15 +263,23 @@ public class UI implements ActionListener {
 	}
 
 	public void refresh() {
-		if(bot.bothset()) 
-			start.setEnabled(true);
+		//check if all required positions are set
+		// & set the colors
+		
+		boolean allset = true;
 
 		for(PosSelector poss : posselctors) {
 			if(bot.isSet(poss.num))
 				poss.green();
-			else
+			else {
 				poss.red();
+				if(poss.isRequired())
+					allset = false;
+			}
 		}
+		
+		if(allset)
+			start.setEnabled(true);
 	}
 
 	public void info(String a) {
@@ -274,6 +288,7 @@ public class UI implements ActionListener {
 
 	public void setPositionDone() {
 		isSelectionRunning = false;
+		
 	}
 	
 	public interface Updater {
