@@ -31,6 +31,7 @@ public class Clicker implements Runnable{
 	private boolean doubleplayout = true;
 	private int truppenwait = 180;
 	private int randomness = 15;
+	private boolean paused = false;
 	
 	private int mincolordistance = 35;
 
@@ -39,6 +40,9 @@ public class Clicker implements Runnable{
 			return;
 		try {
 			Thread.sleep(ms);
+			while(paused) {
+				Thread.sleep(75);
+			}
 		} catch (InterruptedException e) {//when skip is applyed
 			;
 		}
@@ -318,5 +322,14 @@ public class Clicker implements Runnable{
 		if(mincolordistance < minimumdistance)
 			mincolordistance = minimumdistance;
 		System.out.println(colornum + ": "+c.getRed() + " " + c.getGreen() + " " + c.getBlue());
+	}
+
+	
+	public boolean isPaused() {
+		return paused;
+	}
+
+	public void setPause(boolean b) {
+		paused = b;
 	}
 }

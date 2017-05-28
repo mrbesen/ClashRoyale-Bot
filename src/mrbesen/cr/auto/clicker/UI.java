@@ -53,8 +53,9 @@ public class UI implements ActionListener {
 			new PosColSelector(this, "Arena View", false, 7,1)
 	};
 
-	private JButton skip = new JButton("SKIP"); // the button, to skip waiting
 	private JButton start = new JButton("START");
+	private JButton skip = new JButton("SKIP"); // the button, to skip waiting
+	private JButton pause = new JButton("Pause");
 	private JButton exit = new JButton("EXIT");
 
 	private JLabel info = new JLabel("Define positions, to start.");
@@ -161,6 +162,15 @@ public class UI implements ActionListener {
 				bot.stop();
 				frame.setVisible(false);
 				System.exit(0);
+			} else if(srcb.equals(pause)) {
+				if(bot.isPaused()) {//the bot is going to be unpaused
+					pause.setText("Pause");
+					info("Unpaused.");
+				} else {//the bot is going to be paused.
+					pause.setText("Unpause");
+					info("Paused.");
+				}
+				bot.setPause(!bot.isPaused());
 			}
 		} else if(src instanceof JMenuItem) {
 			JMenuItem srcI = (JMenuItem) src;
