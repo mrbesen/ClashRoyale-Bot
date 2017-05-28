@@ -10,7 +10,7 @@ These clicks can cause Troops to spawn or Buttons to be Pressed.
 This program emulates a mouse and keyboard and controls your computer with that emulated hardware. To The App it look, like you are a normal User.
 
 ##### Features:
-Automated Backfocus
-Save / Load Profiles
-Pause or Skip Actions
-defineable placement speed or randmoness
+ * Automated Backfocus
+ * Save / Load Profiles
+ * Pause or Skip Actions
+ * defineable placement speed or randmoness
