@@ -260,6 +260,8 @@ public class Clicker implements Runnable{
 	 * @return true, if there are more then 70px alike enough
 	 */
 	private boolean checkOK(Point p, Robot bot, Color goalcolor) {
+		if(p == null | bot == null | goalcolor == null)
+			return false;
 		//long start = System.currentTimeMillis();
 		int count = 0;
 		BufferedImage img = bot.createScreenCapture(new Rectangle(p.x-10, p.y-10, 20, 20));//smile
