@@ -103,6 +103,7 @@ public class UI implements ActionListener {
 
 		skip.addActionListener(this);
 		start.addActionListener(this);
+		pause.addActionListener(this);
 		exit.addActionListener(this);
 		doubleplace.addActionListener(this);
 
@@ -112,6 +113,7 @@ public class UI implements ActionListener {
 
 		bottom.add(start);
 		bottom.add(skip);
+		bottom.add(pause);
 		bottom.add(exit);
 		bottom.add(autoplay);
 		bottom.add(doubleplace);
@@ -181,16 +183,6 @@ public class UI implements ActionListener {
 			}
 		} else if(src instanceof JCheckBox) {
 			JCheckBox srcb = (JCheckBox) src;
-			/*		if(srcb.equals(autoplay)) {
-				bot.setAutoPlay(srcb.isSelected());
-				if(srcb.isSelected()) {
-					slider[0].setEnabled(true);
-					doubleplace.setEnabled(true);
-				} else {
-					slider[0].setEnabled(false);
-					doubleplace.setEnabled(false);
-				}
-			} else */
 			if(srcb.equals(doubleplace)) {
 				bot.setDoublePlay(srcb.isSelected());
 				if(srcb.isSelected()) {//*2
