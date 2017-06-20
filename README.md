@@ -1,6 +1,9 @@
 # ClashRoyale-Bot
 A Bot, that controls ClashRoyal. Perfect for Crown farming.
 
+## Download
+[Download](http://github.com/mrbesen/clashroyale-bot/releases/)
+
 ###### How to use it?
 This java Apllication needs some kind of Mobile Device Emulator or Interface.
 I have tested it with Teamviewer and Nox Appplayer. You can configure points of the Clashroyale app, where the bot automatically clicks.
