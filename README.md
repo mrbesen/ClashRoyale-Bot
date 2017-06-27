@@ -1,6 +1,16 @@
 # ClashRoyale-Bot
 A Bot, that controls ClashRoyal. Perfect for Crown farming.
 
+### What is this bot?
+ * Automated Bot for Battles
+ * funny to watch
+ 
+### What is this bot not?
+ * A way to farm trophys
+ * A Programm that plays beter than an average human
+ * Time efficent
+
+
 ## Download
 [Download](http://github.com/mrbesen/clashroyale-bot/releases/)
 
