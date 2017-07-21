@@ -1,7 +1,7 @@
 # ClashRoyale-Bot
 A Bot, that controls ClashRoyal. Perfect for Crown farming.
 
-# Warning ! You might get banned for useing this Programm.
+# Warning ! You might get banned for useing this Program.
 And you going to loose some trophys.
 Bot losses some matches -> Vot gets easyer oponents -> Bot winns some matches -> Bot gets harder oponents -> Bot looses some matches....
 ### What is this bot?
