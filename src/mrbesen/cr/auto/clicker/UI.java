@@ -1,6 +1,8 @@
 package mrbesen.cr.auto.clicker;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -9,6 +11,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Scanner;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -31,8 +35,9 @@ public class UI implements ActionListener {
 
 	private JPanel root = new JPanel();
 	private JPanel top = new JPanel();
+	private JPanel middle = new JPanel();
+	private JPanel sliderpanel = new JPanel();
 	private JPanel bottom = new JPanel();
-	//JPanel slider = new JPanel();
 
 	private JMenuBar menubar = new JMenuBar();
 	private JMenu file_ = new JMenu("File");
@@ -60,6 +65,7 @@ public class UI implements ActionListener {
 	private JButton exit = new JButton("EXIT");
 
 	private JLabel info = new JLabel("Define positions, to start.");
+	private JLabel time = new JLabel("0 s");
 
 	private Slider[] slider = {
 			new Slider("Waittime: ","s", 1,300,180,-1, null, new Updater() {
@@ -75,9 +81,11 @@ public class UI implements ActionListener {
 				}
 			},false)
 	};
-
+	
+	
 	Clicker bot = new Clicker();
 
+	
 	private File file = new File(".profile");
 
 	public UI() {
@@ -109,29 +117,32 @@ public class UI implements ActionListener {
 		doubleplace.addActionListener(this);
 		backfocus.addActionListener(this);
 
-		for(PosSelector poss : posselctors) {
+		for(PosSelector poss : posselctors) {//construct PosSelector Panel
 			top.add(poss.button);
 		}
 
-		bottom.add(start);
-		bottom.add(skip);
-		bottom.add(pause);
-		bottom.add(exit);
-		bottom.add(autoplay);
-		bottom.add(doubleplace);
-		bottom.add(backfocus);
-
-		root.add(top);
+		middle.add(start);//construct button paneö
+		middle.add(skip);
+		middle.add(pause);
+		middle.add(exit);
+		middle.add(autoplay);
+		middle.add(doubleplace);
+		middle.add(backfocus);
+		
+		for(Slider s : slider) {//construct slider panel
+			sliderpanel.add(s);
+		}
+		
+		bottom.add(info);//construct bottom panel
+		bottom.add(Box.createRigidArea(new Dimension(150, 5)));
+		bottom.add(time);
+		
+		root.add(top);//add every pannel
+		root.add(middle);
+		root.add(sliderpanel);
 		root.add(bottom);
 		
-		root.add(info);
-		
-		for(Slider s : slider) {
-			root.add(s);
-		}
-
-		frame.add(root);
-
+		frame.add(root);//create frame
 		frame.setVisible(true);
 	}
 
@@ -286,11 +297,67 @@ public class UI implements ActionListener {
 		info.setText(a);
 	}
 
+	/**
+	 * Set the time label to this time.
+	 * @param seconds in seconds.
+	 * Negative time is set to zero.
+	 */
+	public void printTime(int seconds) {
+		if(seconds < 0)//not allowed
+			seconds = 0;
+		
+		StringBuilder out = new StringBuilder();
+		
+		int d = 0;
+		while(seconds >= 86400) {
+			seconds -= 86400;
+			d ++;
+		}
+		
+		if(d > 0) {
+			out.append(d);
+			out.append("d ");
+		}
+		
+		int h = 0;//hours
+		while(seconds >= 3600) {
+			seconds -= 3600;
+			h ++;
+		}
+		
+		if(h > 0) {
+			out.append(h);
+			out.append("h ");
+		}
+		
+		int m = 0;//min
+		while(seconds >= 60) {
+			seconds -= 60;
+			m ++;
+		}
+		
+		if(m > 0) {
+			out.append(m);
+			out.append("m ");
+		}
+		
+		if(seconds > 0) {
+			out.append(seconds);
+			out.append("s");
+		}
+		
+		if(out.length() == 0)
+			out.append('-');//nothing
+		
+		time.setText(out.toString());
+	}
+	
 	public void setPositionDone() {
 		isSelectionRunning = false;
 		
 	}
 	
+
 	public interface Updater {
 		public void update(int nummber);
 	}

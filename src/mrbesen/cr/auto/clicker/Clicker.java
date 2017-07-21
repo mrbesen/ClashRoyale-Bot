@@ -40,18 +40,24 @@ public class Clicker implements Runnable{
 
 	OSType os;
 
+	long started = -1;
 
 	private void sleep( int ms) {
+		//update ui
+		Main.get().ui.printTime((int) ( (System.currentTimeMillis()-started) / 1000 ));
+		
 		if(skipbattle)
 			return;
 		try {
-			Thread.sleep(ms);
-			while(paused) {
+			if(ms > 1000) {
+				Thread.sleep(1000);
+				sleep(ms-1000);
+			} else
+				Thread.sleep(ms);
+			while(paused & should_run) {
 				Thread.sleep(75);
 			}
-		} catch (InterruptedException e) {//when skip is applyed
-			;
-		}
+		} catch (InterruptedException e) { } //when skip is applyed, or the bot gets stopped
 	}
 
 	public void start() {
@@ -60,11 +66,13 @@ public class Clicker implements Runnable{
 			running = true;
 			thread = new Thread(this, "BOT");
 			thread.start();
+			started = System.currentTimeMillis();
 		}
 	}
 
 	public void stop() {
 		should_run = false;
+		skipbattle = true;
 		while(running) {
 			thread.interrupt();//stop that shit (its maybe sleeping)
 		}
@@ -142,7 +150,7 @@ public class Clicker implements Runnable{
 					//        eingestellter wert (0.1 sec) ggf. durch 2 teilen   vergangene zeit abziehen (zeit fürs setztem der letzten truppen)   
 					int waittime = ( (int) (((truppenwait * 100) / modifier) - (System.currentTimeMillis()- lastwait)) );//how long to wait?
 					Main.get().ui.info("Waiting for: " + waittime);
-					while (waittime > 1500 & !skipbattle) {//check for the ok-button every 3 seconds
+					while (waittime > 1500 & !skipbattle & should_run) {//check for the ok-button every 3 seconds
 						long startwait = System.currentTimeMillis();//record needed time
 						if(checkOK(end, rob, ok_button)) {//check
 							Main.get().ui.info("OK-button detected!");
