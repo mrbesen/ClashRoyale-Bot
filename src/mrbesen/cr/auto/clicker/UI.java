@@ -18,6 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
@@ -258,6 +259,16 @@ public class UI implements ActionListener {
 		try {
 			if(!file.exists())
 				file.createNewFile();
+			else {
+				/*ok == 0
+				cancel = 2*/ 
+				int choose = JOptionPane.showConfirmDialog(null, "You are going to override the old profile!", "Override", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+				if(choose == 2) {
+					info("canceled.");
+					return;
+				}
+					
+			}
 
 			FileWriter fw = new FileWriter(file);
 			fw.write(bot.serialize()+"\n101 "+ slider[0].getValue() + "\n102 " + doubleplace.isSelected()+"\n103 " + slider[1].getValue());
