@@ -3,7 +3,7 @@ A Bot, that controls ClashRoyal. Perfect for Crown farming.
 
 # Warning ! You might get banned for useing this Program.
 And you going to loose some trophys.
-Bot losses some matches -> Vot gets easyer oponents -> Bot winns some matches -> Bot gets harder oponents -> Bot looses some matches....
+Bot losses some matches -> Bot gets easyer oponents -> Bot winns some matches (And earn crowns) -> Bot gets harder oponents -> Bot looses some matches....
 ### What is this bot?
  * Automated Bot for Battles
  * funny to watch
