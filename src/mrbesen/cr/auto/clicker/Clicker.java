@@ -9,6 +9,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
+import com.sun.javafx.binding.StringFormatter;
+
 public class Clicker implements Runnable{
 
 	private boolean running = false;
@@ -149,7 +151,7 @@ public class Clicker implements Runnable{
 						modifier = 1.5f;
 					//        eingestellter wert (0.1 sec) ggf. durch 2 teilen   vergangene zeit abziehen (zeit fürs setztem der letzten truppen)   
 					int waittime = ( (int) (((truppenwait * 100) / modifier) - (System.currentTimeMillis()- lastwait)) );//how long to wait?
-					Main.get().ui.info("Waiting for: " + waittime);
+					Main.get().ui.info("Waiting for: " + (waittime / 1000) + "s");
 					while (waittime > 1500 & !skipbattle & should_run) {//check for the ok-button every 3 seconds
 						long startwait = System.currentTimeMillis();//record needed time
 						if(checkOK(end, rob, ok_button)) {//check
@@ -171,7 +173,7 @@ public class Clicker implements Runnable{
 				Main.get().ui.info("Battle ended.");
 				sleep(9000);//9 sec-loading screen
 				//checken, ob Arena wechsel pop-up
-				while(checkOK(arena_switch, rob,arena_view)) {
+				while(checkOK(arena_switch, rob,arena_view) & should_run) {
 					System.out.println("Arena found, clicking");
 					clickL(rob, arena_switch);
 					backfocus(rob);
