@@ -9,8 +9,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
-import com.sun.javafx.binding.StringFormatter;
-
 public class Clicker implements Runnable{
 
 	private boolean running = false;
