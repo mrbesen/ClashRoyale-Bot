@@ -37,9 +37,7 @@ public class Clicker implements Runnable{
 	private final int waittime = 50;//time between mouse teleports and clicks
 
 	private int mincolordistance = 35;
-
 	OSType os;
-
 	long started = -1;
 
 	private void sleep( int ms) {
@@ -57,15 +55,14 @@ public class Clicker implements Runnable{
 			while(paused & should_run) {
 				Thread.sleep(75);
 			}
-		} catch (InterruptedException e) { } //when skip is applyed, or the bot gets stopped
+		} catch (InterruptedException e) { } //when skip is applied, or the bot gets stopped
 	}
 
 	public void start() {
 		should_run = true;
 		if(!running) {
 			running = true;
-			thread = new Thread(this, "BOT");
-			thread.start();
+			(thread = new Thread(this, "BOT")).start();;
 			started = System.currentTimeMillis();
 		}
 	}
@@ -74,7 +71,7 @@ public class Clicker implements Runnable{
 		should_run = false;
 		skipbattle = true;
 		while(running) {
-			thread.interrupt();//stop that shit (its maybe sleeping)
+			thread.interrupt();//stop that shit (its maybe sleepin)
 		}
 	}
 
@@ -82,7 +79,7 @@ public class Clicker implements Runnable{
 		if(isRunning())
 			if(inbattle)
 				skipbattle = true;
-		thread.interrupt();
+				thread.interrupt(); //Stop
 	}
 
 	public boolean isRunning() {
@@ -91,29 +88,29 @@ public class Clicker implements Runnable{
 
 	@Override
 	public void run() {
-		sleep(1000);//chill ma
+		sleep(1000);//chill for a second.
 
 		//determine os
-		String oss = System.getProperty("os.name").toLowerCase();
-		if(oss.contains("nix") | oss.contains("nux") | oss.contains("aix")) 
+		String ostype = System.getProperty("os.name").toLowerCase();
+		if(ostype.contains("nix") | ostype.contains("nux") | ostype.contains("aix")) 
 			os = OSType.Linux;
-		else if(oss.contains("win"))
+		else if(ostype.contains("win"))
 			os = OSType.Windows;
-		else if(oss.contains("mac")) 
+		else if(ostype.contains("mac")) 
 			os = OSType.OSX;
 		else 
-			Main.get().ui.info("OS not supported for backfocus: " + oss);
+			Main.get().ui.info("OS not supported for backfocus: " + ostype);
 
 		int card = 0;
 		try {
 			Robot rob = new Robot();
 			while(should_run) {
 				sleep(500);
-				clickL(rob, battle);//smash the start button
+				clickL(rob, battle);//click the start button
 				sleep(1000);
-				clickL(rob, battle);//press start again (if there is an alert poping up)
+				clickL(rob, battle);//Press again (in case of alert).
 				backfocus(rob);
-				//battle is starting up
+				// Start of battle
 				sleep(9000);//wait for the battle to start (loading screen)
 				Main.get().ui.info("Battle started.");
 				inbattle = true;
@@ -122,8 +119,8 @@ public class Clicker implements Runnable{
 				long lastwait = start;//actions like moving mouse and do stuff gets messured and subtracted of the wait's
 				while( ((System.currentTimeMillis() - start) / 6000) < 41 & should_run & !skipbattle) {
 
-					//check für ok-button
-					if(round(start) > 20) {//game is older then 20 seconds
+					//check for ok-button
+					if(round(start) > 20) {//game is older than 20 seconds
 						if(checkOK(end, rob,ok_button)) {//check
 							Main.get().ui.info("OK-button detected!");
 							skipbattle = true;
@@ -145,11 +142,11 @@ public class Clicker implements Runnable{
 
 					if(round(start) >= 115) //game older than 2 minutes -> speed the playout process up!
 						modifier = 2;
-					else if(round(start) >= (115 - (truppenwait / 2))) //remove half waittime and do half speed.
+					else if(round(start) >= (115 - (truppenwait / 2))) //remove half of the waiting time and do half speed.
 						modifier = 1.5f;
-					//        eingestellter wert (0.1 sec) ggf. durch 2 teilen   vergangene zeit abziehen (zeit fürs setztem der letzten truppen)   
+					//        eingestellter wert (0.1 sec) ggf. durch 2 teilen   vergangene zeit abziehen (zeit fürs setztem der letzten truppen) / Some calculation...  
 					int waittime = ( (int) (((truppenwait * 100) / modifier) - (System.currentTimeMillis()- lastwait)) );//how long to wait?
-					Main.get().ui.info("Waiting for: " + (waittime / 1000) + "s");
+					Main.get().ui.info("Waiting for: " + (waittime / 1000) + "seconds");
 					while (waittime > 1500 & !skipbattle & should_run) {//check for the ok-button every 3 seconds
 						long startwait = System.currentTimeMillis();//record needed time
 						if(checkOK(end, rob, ok_button)) {//check
@@ -158,7 +155,7 @@ public class Clicker implements Runnable{
 							break;
 						} 
 						sleep((int) (1500 - (System.currentTimeMillis() - startwait)));//sleep the rest of 3 seconds, that was not gone for checking
-						waittime = (int) (waittime - (System.currentTimeMillis() - startwait));//calculate waittime that is left
+						waittime = (int) (waittime - (System.currentTimeMillis() - startwait));//calculate waiting time that's left
 					}
 					sleep(waittime);//wait
 
@@ -184,7 +181,7 @@ public class Clicker implements Runnable{
 		running= false;//remove the running flag
 	}
 
-	private float round(long start) {//returns how old the round is in 0.1 seconds
+	private float round(long start) {//returns how old the round is in 0.1 second
 		return ((System.currentTimeMillis() - start) / 1000);
 	}
 
@@ -298,7 +295,7 @@ public class Clicker implements Runnable{
 		sleep(50);
 	}
 
-	private void clickL(Robot b) {//40 ms delay
+	private void clickL(Robot b) {//40 milli seconds delay
 		b.mousePress(InputEvent.BUTTON1_MASK);
 		sleep(waittime);
 		b.mouseRelease(InputEvent.BUTTON1_MASK);
@@ -328,7 +325,7 @@ public class Clicker implements Runnable{
 			for (int y = 0; y < 20; y++) {
 				int color = img.getRGB(x, y);
 				int red = (color & 0x00ff0000) >> 16;
-			int green = (color & 0x0000ff00) >> 8;
+			int green = (color & 0x0000ff00) >> 8; // WTF DUDE
 		int blue = color & 0x000000ff;
 		double distance = Math.sqrt(Math.pow((blue - goalcolor.getBlue()), 2)
 				+ Math.pow((red - goalcolor.getRed()), 2) + Math.pow((green - goalcolor.getGreen()), 2));//calculate the distance between the goalcolor and the test color
@@ -381,17 +378,17 @@ public class Clicker implements Runnable{
 
 
 	public boolean isPaused() {
-		return paused;
+		return this.paused;
 	}
 
 	public void setPause(boolean b) {
-		paused = b;
+		this.paused = b;
 	}
 
 	private enum OSType {
 		Linux,
 		Windows,
 		OSX,
-		unsupported
+		Unsupported
 	}
 }

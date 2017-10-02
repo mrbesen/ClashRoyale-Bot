@@ -30,7 +30,7 @@ public class UI implements ActionListener {
 
 	private boolean isSelectionRunning = false; //true if an selection Thread is working, 
 	
-	private JFrame frame = new JFrame("Clash Royale Bot · by MrBesen");;
+	private JFrame frame = new JFrame("Clash Royale Bot by MrBesen");;
 
 	private JPanel root = new JPanel();
 	private JPanel top = new JPanel();
@@ -120,7 +120,7 @@ public class UI implements ActionListener {
 			top.add(poss.button);
 		}
 
-		middle.add(start);//construct button paneö
+		middle.add(start);//construct button panel
 		middle.add(skip);
 		middle.add(pause);
 		middle.add(exit);
@@ -136,7 +136,7 @@ public class UI implements ActionListener {
 		bottom.add(Box.createRigidArea(new Dimension(150, 5)));
 		bottom.add(time);
 		
-		root.add(top);//add every pannel
+		root.add(top);//add every panel
 		root.add(middle);
 		root.add(sliderpanel);
 		root.add(bottom);
@@ -151,7 +151,7 @@ public class UI implements ActionListener {
 		if(src instanceof JButton) {
 			JButton srcb = (JButton) src;
 
-			//check for the Posselectors
+			//check for the Position selectors
 			for(PosSelector poss : posselctors) {
 				if(poss.button.equals(srcb)) {
 					if(!isSelectionRunning)
@@ -219,7 +219,7 @@ public class UI implements ActionListener {
 					if(!split[1].equals("null")) {
 						int num = Integer.parseInt(split[0]);
 						if(num > 100) {//special settings (slider / checkboxes)
-							if(num == 101) {//truppenwait
+							if(num == 101) {//group wait
 								int wait = Integer.parseInt(split[1]);
 								slider[0].setValue(wait);
 							} else if(num == 102) { // double playout
@@ -237,14 +237,14 @@ public class UI implements ActionListener {
 								Color c = new Color(Integer.parseInt(split[1]), Integer.parseInt(split[2]), Integer.parseInt(split[3]));
 								bot.setColor(c, 0,35);
 							}
-						} else //standard Point Obj.
+						} else //standard Point object.
 							bot.set(new Point(split[1]), num);
 					}
 				}
 				s.close();
 				refresh();
 				if(info)
-					info("loaded!");
+					info("Loaded!");
 			} catch(IOException | NumberFormatException e) {
 				e.printStackTrace();
 				if(info)
@@ -264,7 +264,7 @@ public class UI implements ActionListener {
 				cancel = 2*/ 
 				int choose = JOptionPane.showConfirmDialog(null, "You are going to override the old profile!", "Override", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 				if(choose == 2) {
-					info("canceled.");
+					info("Canceled.");
 					return;
 				}
 					
@@ -275,7 +275,7 @@ public class UI implements ActionListener {
 			fw.flush();
 			fw.close();
 
-			info("saved!");
+			info("Saved!");
 		} catch(IOException e) {
 			e.printStackTrace();
 			info("Error.");
@@ -409,13 +409,13 @@ public class UI implements ActionListener {
 		private int offset;
 		/**
 		 * @param prefix the text of the Label
-		 * @param sufix  thge text of the Label
-		 * @param minvalue start vlaue
+		 * @param suffix  thge text of the Label
+		 * @param minvalue start value
 		 * @param maxvalue last value
-		 * @param startvalue inital value
-		 * @param komma 10^x offset for komma digits
+		 * @param startvalue initial value
+		 * @param comma 10^x offset for comma digits
 		 */
-		public Slider(String prefix, String sufix, int minvalue, int maxvalue, int startvalue, int komma, @Nullable ChangeListener cl,@Nullable Updater upd, boolean enabled) {//ChangeListener or Updater could be Null!
+		public Slider(String prefix, String suffix, int minvalue, int maxvalue, int startvalue, int comma, @Nullable ChangeListener cl,@Nullable Updater upd, boolean enabled) {//ChangeListener or Updater could be Null!
 			slider = new JSlider(minvalue, maxvalue, startvalue);
 			slider.addChangeListener(this);
 			if(prefix != null)
@@ -423,7 +423,7 @@ public class UI implements ActionListener {
 			if(sufix != null) {
 				this.sufix = sufix;
 			}
-			offset = komma;
+			offset = comma;
 			label = new JLabel(getLabelText());
 			add(slider);
 			add(label);
@@ -453,9 +453,9 @@ public class UI implements ActionListener {
 
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			label.setText(getLabelText());//update info
+			label.setText(getLabelText());//update information
 			if(listener != null)
-				listener.stateChanged(e);//forward Event
+				listener.stateChanged(e);//forward event
 			if(updater != null)
 				updater.update(slider.getValue());
 		}
