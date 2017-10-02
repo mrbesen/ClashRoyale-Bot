@@ -25,7 +25,7 @@ public class PosColSelector extends PosSelector {
 			Robot rob = new Robot();
 			Point p = ui.bot.getMouse();
 			BufferedImage img = rob.createScreenCapture(new Rectangle(p.x-10, p.y-10, 20, 20));
-			//calculate avg color;
+			//calculate average color;
 			int red = 0;
 			int green = 0;
 			int blue = 0;
