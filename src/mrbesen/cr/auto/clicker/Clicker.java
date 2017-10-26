@@ -403,9 +403,14 @@ public class Clicker implements Runnable{
 	
 	public void toggleOverlay() {
 		if(ov == null) {
-			ov = new Overlay();
-			ov.set(playout, cardslots, end, battle, arena_switch);
-			ov.init();
+			try {
+				ov = new Overlay();
+				ov.set(playout, cardslots, end, battle, arena_switch);
+				ov.init();
+			} catch(Exception e) {
+				System.out.println("Catched Exception, while inflateing Overlay: ");
+				e.printStackTrace();
+			}
 		} else {
 			ov.close();
 			ov = null;
