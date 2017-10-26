@@ -62,6 +62,7 @@ public class UI implements ActionListener {
 	private JButton skip = new JButton("SKIP"); // the button, to skip waiting
 	private JButton pause = new JButton("Pause");
 	private JButton exit = new JButton("EXIT");
+	private JButton overlay = new JButton("Overlay");
 
 	private JLabel info = new JLabel("Define positions, to start.");
 	private JLabel time = new JLabel("0 s");
@@ -113,6 +114,7 @@ public class UI implements ActionListener {
 		start.addActionListener(this);
 		pause.addActionListener(this);
 		exit.addActionListener(this);
+		overlay.addActionListener(this);
 		doubleplace.addActionListener(this);
 		backfocus.addActionListener(this);
 
@@ -124,6 +126,7 @@ public class UI implements ActionListener {
 		middle.add(skip);
 		middle.add(pause);
 		middle.add(exit);
+		middle.add(overlay);
 		middle.add(autoplay);
 		middle.add(doubleplace);
 		middle.add(backfocus);
@@ -187,6 +190,8 @@ public class UI implements ActionListener {
 					info("Paused.");
 				}
 				bot.setPause(!bot.isPaused());
+			} else if(srcb.equals(overlay)) {
+				bot.toggleOverlay();
 			}
 		} else if(src instanceof JMenuItem) {
 			JMenuItem srcI = (JMenuItem) src;

@@ -37,6 +37,7 @@ public class Clicker implements Runnable{
 	private final int waittime = 50;//time between mouse teleports and clicks
 
 	private int mincolordistance = 35;
+	private Overlay ov = null;
 
 	OSType os;
 
@@ -393,5 +394,17 @@ public class Clicker implements Runnable{
 		Windows,
 		OSX,
 		unsupported
+	}
+
+	
+	public void toggleOverlay() {
+		if(ov == null) {
+			ov = new Overlay();
+			ov.set(playout, cardslots, end, battle, arena_switch);
+			ov.init();
+		} else {
+			ov.close();
+			ov = null;
+		}
 	}
 }
