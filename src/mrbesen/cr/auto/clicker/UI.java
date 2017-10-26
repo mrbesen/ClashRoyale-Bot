@@ -90,6 +90,7 @@ public class UI implements ActionListener {
 
 	public UI() {
 		Main.get().ui = this;
+		
 		//init screen
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.setSize(830, 180);
@@ -146,6 +147,28 @@ public class UI implements ActionListener {
 		
 		frame.add(root);//create frame
 		frame.setVisible(true);
+		
+		//set tooltips
+		start.setToolTipText("Starts the Bot.");
+		skip.setToolTipText("Skips the current Action.(Waiting or beeing in a match, only usefull, when the bot miss clicked somewhere)");
+		pause.setToolTipText("Pauses the \"output\" of the Bot, but the internal states are still updated.");
+		exit.setToolTipText("Stops the Bot and closes the Window.");
+		overlay.setToolTipText("Enables a Overlay to visualize where the Bot trys to click.");
+		autoplay.setToolTipText("Enable or disable auto placement of cards.");
+		doubleplace.setToolTipText("Everytime the bot wants to play a card, he trys to play two cards at once.");
+		backfocus.setToolTipText("After each mouseclickaction the bot tryes to give the old window the focus back.");
+		slider[0].setToolTipText("the time the Bot waits between two crads.");
+		slider[1].setToolTipText("Give a value, how offset the playout place should be, to look more like a human player to the opponent and the game itself.");
+		
+		posselctors[0].button.setToolTipText("Set the position for the \"Battle\"-Button.");
+		posselctors[1].button.setToolTipText("Set the position for the \"ok\"-Button at the end of a match. Be carefull, this also saves the color of the button to auto-detect it.");
+		posselctors[2].button.setToolTipText("Set the Position of Card 1");
+		posselctors[3].button.setToolTipText("Set the Position of Card 2");
+		posselctors[4].button.setToolTipText("Set the Position of Card 3");
+		posselctors[5].button.setToolTipText("Set the Position of Card 4");
+		posselctors[6].button.setToolTipText("Set the Position, where a Card should be placed. Leave it empty to use the same position as the \"Battle\" position.");
+		posselctors[7].button.setToolTipText("Set the position of the Close button, of the menue that po up, when you tap the arena. This one also saves the color of the position to auto detect it.");
+		
 	}
 
 	@Override
