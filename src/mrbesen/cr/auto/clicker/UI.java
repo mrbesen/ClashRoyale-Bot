@@ -42,6 +42,7 @@ public class UI implements ActionListener {
 	private JMenu file_ = new JMenu("File");
 	private JMenuItem load = new JMenuItem();
 	private JMenuItem save = new JMenuItem();
+	private JMenuItem new_ = new JMenuItem();
 
 	private AutoPlayBox autoplay = new AutoPlayBox();
 	private JCheckBox doubleplace = new JCheckBox("DoublePlace");
@@ -99,9 +100,12 @@ public class UI implements ActionListener {
 		save.addActionListener(this);
 		load.setText("Load");
 		load.addActionListener(this);
+		new_.setText("New");
+		new_.addActionListener(this);
 
 		file_.add(save);
 		file_.add(load);
+		file_.add(new_);
 		menubar.add(file_);
 		frame.setJMenuBar(menubar);
 
@@ -222,6 +226,8 @@ public class UI implements ActionListener {
 				load(true);
 			} else if(srcI.equals(save)) {
 				save();
+			} else if(srcI.equals(new_)) {
+				new_();
 			}
 		} else if(src instanceof JCheckBox) {
 			JCheckBox srcb = (JCheckBox) src;
@@ -310,6 +316,17 @@ public class UI implements ActionListener {
 		}
 	}
 
+	private void new_() {
+		int choose = JOptionPane.showConfirmDialog(null, "All of your setting are going to be lost, if you dont save it.", "Settings lost", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if(choose == 2) {
+			info("canceled.");
+			return;
+		}
+		bot.stop();
+		bot = null;
+		bot = new Clicker();
+	}
+	
 	public void refresh() {
 		//check if all required positions are set
 		// & set the colors
