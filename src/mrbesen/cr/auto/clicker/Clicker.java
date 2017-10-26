@@ -39,7 +39,7 @@ public class Clicker implements Runnable{
 	private int mincolordistance = 35;
 	private Overlay ov = null;
 
-	OSType os;
+	private int alt_key;
 
 	long started = -1;
 
@@ -94,17 +94,10 @@ public class Clicker implements Runnable{
 	public void run() {
 		sleep(1000);//chill ma
 
-		//determine os
 		String oss = System.getProperty("os.name").toLowerCase();
-		if(oss.contains("nix") | oss.contains("nux") | oss.contains("aix")) 
-			os = OSType.Linux;
-		else if(oss.contains("win"))
-			os = OSType.Windows;
-		else if(oss.contains("mac")) 
-			os = OSType.OSX;
-		else 
-			Main.get().ui.info("OS not supported for backfocus: " + oss);
-
+		alt_key = ( oss.contains("nix") | oss.contains("nux") | oss.contains("aix") | oss.contains("win") ? KeyEvent.VK_ALT : KeyEvent.VK_META);
+		//windows and linux have another alt key than mac, so lets determine the OS type, to determine the key code.
+		
 		int card = 0;
 		try {
 			Robot rob = new Robot();
@@ -208,8 +201,6 @@ public class Clicker implements Runnable{
 
 	private void backfocus(Robot bot) {
 		if(backfocus) {
-			
-			int alt_key = ( os == OSType.Windows | os == OSType.Linux ? KeyEvent.VK_ALT : KeyEvent.VK_META);
 			
 			bot.keyPress(alt_key);
 			
@@ -385,13 +376,6 @@ public class Clicker implements Runnable{
 
 	public void setPause(boolean b) {
 		paused = b;
-	}
-
-	private enum OSType {
-		Linux,
-		Windows,
-		OSX,
-		unsupported
 	}
 
 	public static Rectangle getRect(int x, int y) {
