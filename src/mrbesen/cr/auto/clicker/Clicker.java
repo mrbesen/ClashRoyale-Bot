@@ -51,7 +51,7 @@ public class Clicker implements Runnable{
 			return;
 		try {
 			if(ms > 1000) {
-				Thread.sleep(1000);
+				Thread.sleep(1000);//split the sleep time.
 				sleep(ms-1000);
 			} else
 				Thread.sleep(ms);
@@ -163,13 +163,13 @@ public class Clicker implements Runnable{
 				clickL(rob, end);//ok button
 				backfocus(rob);
 				Main.get().ui.info("Battle ended.");
-				sleep(9000);//9 sec-loading screen
+				sleep(7000);//7 sec-loading screen
 				//checken, ob Arena wechsel pop-up
 				while(checkOK(arena_switch, rob,arena_view) & should_run) {
 					System.out.println("Arena found, clicking");
 					clickL(rob, arena_switch);
 					backfocus(rob);
-					sleep(2000);
+					sleep(2000);//wait 2 seconds
 				}
 			}
 		} catch (AWTException e) {
@@ -276,18 +276,26 @@ public class Clicker implements Runnable{
 		return (end != null & battle != null);
 	}
 
+	/**
+	 * Perform a Leftclick.
+	 * @param b the Robot to use
+	 * @param a the Position to click
+	 */
 	private void clickL(Robot b, Point a) {
 		if(!should_run)
 			return;
 		Point old = getMouse();
 		b.mouseMove(a.x, a.y);
-		sleep(50);
+		sleep(waittime);
 		clickL(b);
-		sleep(50);
 		b.mouseMove(old.x, old.y);
-		sleep(50);
+		sleep(waittime);
 	}
 
+	/**
+	 * Perform a Leftclick
+	 * @param b
+	 */
 	private void clickL(Robot b) {//40 ms delay
 		b.mousePress(InputEvent.BUTTON1_MASK);
 		sleep(waittime);
@@ -327,7 +335,7 @@ public class Clicker implements Runnable{
 			}
 		}
 
-		//		System.out.println("counts: " + count);//some performance checking
+		System.out.println("counts: " + count);//some performance checking
 		return count > 4;//engough pixel have the right color
 	}
 
@@ -364,7 +372,7 @@ public class Clicker implements Runnable{
 			arena_view = c;
 			break;
 		}
-		if(mincolordistance < minimumdistance)//enlarging min distance required
+		if(mincolordistance < minimumdistance)//enlarging mindistance
 			mincolordistance = minimumdistance;
 		System.out.println(colornum + ": "+c.getRed() + " " + c.getGreen() + " " + c.getBlue());
 	}
