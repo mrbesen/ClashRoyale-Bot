@@ -29,8 +29,8 @@ public class PosColSelector extends PosSelector {
 			int green = 0;
 			int blue = 0;
 			int count = 0;
-			for (int x = 0; x < 20; x++) {
-				for (int y = 0; y < 20; y++) {
+			for (int x = 0; x < img.getWidth(); x++) {
+				for (int y = 0; y < img.getHeight(); y++) {
 					int color = img.getRGB(x, y);
 					red += (color & 0x00ff0000) >> 16;
 					green += (color & 0x0000ff00) >> 8;
