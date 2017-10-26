@@ -208,18 +208,16 @@ public class Clicker implements Runnable{
 
 	private void backfocus(Robot bot) {
 		if(backfocus) {
-			if(os == OSType.Windows | os == OSType.Linux)
-				bot.keyPress(KeyEvent.VK_ALT);
-			else//osx / unsupported
-				bot.keyPress(KeyEvent.VK_META);
-
+			
+			int alt_key = ( os == OSType.Windows | os == OSType.Linux ? KeyEvent.VK_ALT : KeyEvent.VK_META);
+			
+			bot.keyPress(alt_key);
+			
 			bot.keyPress(KeyEvent.VK_TAB);
 			sleep(waittime);
 			bot.keyRelease(KeyEvent.VK_TAB);
-			if(os == OSType.Windows | os == OSType.Linux)
-				bot.keyRelease(KeyEvent.VK_ALT);
-			else//osx / unsupported
-				bot.keyRelease(KeyEvent.VK_META);
+			
+			bot.keyRelease(alt_key);
 		}
 	}
 
@@ -375,7 +373,7 @@ public class Clicker implements Runnable{
 			arena_view = c;
 			break;
 		}
-		if(mincolordistance < minimumdistance)
+		if(mincolordistance < minimumdistance)//enlarging min distance required
 			mincolordistance = minimumdistance;
 		System.out.println(colornum + ": "+c.getRed() + " " + c.getGreen() + " " + c.getBlue());
 	}
@@ -395,7 +393,6 @@ public class Clicker implements Runnable{
 		OSX,
 		unsupported
 	}
-
 
 	public static Rectangle getRect(int x, int y) {
 		return new Rectangle(x-2, y-2, 5, 5);
