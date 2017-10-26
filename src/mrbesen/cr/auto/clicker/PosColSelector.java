@@ -71,7 +71,7 @@ public class PosColSelector extends PosSelector {
 				}
 			});
 			
-			int miniumdistance = dist.get(150);//at least the first 100 tests should fit
+			int miniumdistance = dist.get((int) (dist.size()*0.3f));//at least the first third tests should fit
 //			int maximumdistance = dist.get(dist.size()-1);
 			System.out.println("minimum distance: " + miniumdistance );
 			ui.bot.setColor(c,colornum, miniumdistance);
