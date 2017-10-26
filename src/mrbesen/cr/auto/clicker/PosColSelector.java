@@ -2,7 +2,6 @@ package mrbesen.cr.auto.clicker;
 
 import java.awt.AWTException;
 import java.awt.Color;
-import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.util.Comparator;
@@ -24,7 +23,7 @@ public class PosColSelector extends PosSelector {
 		try {
 			Robot rob = new Robot();
 			Point p = ui.bot.getMouse();
-			BufferedImage img = rob.createScreenCapture(new Rectangle(p.x-10, p.y-10, 20, 20));
+			BufferedImage img = rob.createScreenCapture(Clicker.getRect(p.x, p.y));
 			//calculate avg color;
 			int red = 0;
 			int green = 0;
@@ -46,8 +45,8 @@ public class PosColSelector extends PosSelector {
 			
 			//calculate distances:
 			List<Integer> dist = new LinkedList<Integer>();
-			for (int x = 0; x < 20; x++) {
-				for (int y = 0; y < 20; y++) {
+			for (int x = 0; x < img.getWidth(); x++) {
+				for (int y = 0; y < img.getHeight(); y++) {
 					int color = img.getRGB(x, y);
 					int redf = (color & 0x00ff0000) >> 16;
 					int greenf = (color & 0x0000ff00) >> 8;

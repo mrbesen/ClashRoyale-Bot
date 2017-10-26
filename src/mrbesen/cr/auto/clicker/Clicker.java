@@ -46,7 +46,7 @@ public class Clicker implements Runnable{
 	private void sleep( int ms) {
 		//update ui
 		Main.get().ui.printTime((int) ( (System.currentTimeMillis()-started) / 1000 ));
-		
+
 		if(skipbattle)
 			return;
 		try {
@@ -324,22 +324,22 @@ public class Clicker implements Runnable{
 			return false;
 		//long start = System.currentTimeMillis();
 		int count = 0;
-		BufferedImage img = bot.createScreenCapture(new Rectangle(p.x-10, p.y-10, 20, 20));//smile
-		for (int x = 0; x < 20; x++) {
-			for (int y = 0; y < 20; y++) {
+		BufferedImage img = bot.createScreenCapture(getRect(p.x, p.y));//smile
+		for (int x = 0; x < img.getWidth(); x++) {
+			for (int y = 0; y < img.getHeight(); y++) {
 				int color = img.getRGB(x, y);
 				int red = (color & 0x00ff0000) >> 16;
-			int green = (color & 0x0000ff00) >> 8;
-		int blue = color & 0x000000ff;
-		double distance = Math.sqrt(Math.pow((blue - goalcolor.getBlue()), 2)
+				int green = (color & 0x0000ff00) >> 8;
+				int blue = color & 0x000000ff;
+				double distance = Math.sqrt(Math.pow((blue - goalcolor.getBlue()), 2)
 				+ Math.pow((red - goalcolor.getRed()), 2) + Math.pow((green - goalcolor.getGreen()), 2));//calculate the distance between the goalcolor and the test color
-		if (distance < mincolordistance)
-			count++;
+				if (distance < mincolordistance)
+					count++;
 			}
 		}
 
 		//		System.out.println("counts: " + count);//some performance checking
-		return count > 70;
+		return count > 4;//engough pixel have the right color
 	}
 
 	public Point getMouse() {
@@ -396,6 +396,10 @@ public class Clicker implements Runnable{
 		unsupported
 	}
 
+
+	public static Rectangle getRect(int x, int y) {
+		return new Rectangle(x-2, y-2, 5, 5);
+	}
 	
 	public void toggleOverlay() {
 		if(ov == null) {

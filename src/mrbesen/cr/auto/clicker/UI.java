@@ -62,7 +62,7 @@ public class UI implements ActionListener {
 	private JButton skip = new JButton("SKIP"); // the button, to skip waiting
 	private JButton pause = new JButton("Pause");
 	private JButton exit = new JButton("EXIT");
-	private JButton overlay = new JButton("Overlay");
+	private JButton overlay = new JButton("Overlay[Experimental]");
 
 	private JLabel info = new JLabel("Define positions, to start.");
 	private JLabel time = new JLabel("0 s");
