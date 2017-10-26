@@ -102,6 +102,7 @@ public class Clicker implements Runnable{
 		try {
 			Robot rob = new Robot();
 			while(should_run) {
+				Main.get().ui.info("Starting Battle.");
 				sleep(500);
 				clickL(rob, battle);//smash the start button
 				sleep(1000);
@@ -109,11 +110,11 @@ public class Clicker implements Runnable{
 				backfocus(rob);
 				//battle is starting up
 				sleep(9000);//wait for the battle to start (loading screen)
-				Main.get().ui.info("Battle started.");
 				inbattle = true;
 				float modifier = 1;
 				long start = System.currentTimeMillis();
 				long lastwait = start;//actions like moving mouse and do stuff gets messured and subtracted of the wait's
+				Main.get().ui.info("Battle begins.");
 				while( ((System.currentTimeMillis() - start) / 6000) < 41 & should_run & !skipbattle) {
 
 					//check für ok-button
@@ -166,7 +167,7 @@ public class Clicker implements Runnable{
 				sleep(7000);//7 sec-loading screen
 				//checken, ob Arena wechsel pop-up
 				while(checkOK(arena_switch, rob,arena_view) & should_run) {
-					System.out.println("Arena found, clicking");
+					Main.get().ui.info("Arena found, clicking");
 					clickL(rob, arena_switch);
 					backfocus(rob);
 					sleep(2000);//wait 2 seconds
