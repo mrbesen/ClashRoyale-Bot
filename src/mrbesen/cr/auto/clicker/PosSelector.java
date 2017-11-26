@@ -24,6 +24,7 @@ public class PosSelector implements Runnable {
 
 	@Override
 	public void run() {
+		button.setBackground(Color.MAGENTA);
 		try {
 			for(int i = 5; i > 0; i--) {//countdown
 				ui.info(i + "");

@@ -37,20 +37,21 @@ public class Clicker implements Runnable{
 	private final int waittime = 50;//time between mouse teleports and clicks
 
 	private int mincolordistance = 35;
+	private Overlay ov = null;
 
-	OSType os;
+	private int alt_key;
 
 	long started = -1;
 
 	private void sleep( int ms) {
 		//update ui
 		Main.get().ui.printTime((int) ( (System.currentTimeMillis()-started) / 1000 ));
-		
+
 		if(skipbattle)
 			return;
 		try {
 			if(ms > 1000) {
-				Thread.sleep(1000);
+				Thread.sleep(1000);//split the sleep time.
 				sleep(ms-1000);
 			} else
 				Thread.sleep(ms);
@@ -93,21 +94,15 @@ public class Clicker implements Runnable{
 	public void run() {
 		sleep(1000);//chill ma
 
-		//determine os
 		String oss = System.getProperty("os.name").toLowerCase();
-		if(oss.contains("nix") | oss.contains("nux") | oss.contains("aix")) 
-			os = OSType.Linux;
-		else if(oss.contains("win"))
-			os = OSType.Windows;
-		else if(oss.contains("mac")) 
-			os = OSType.OSX;
-		else 
-			Main.get().ui.info("OS not supported for backfocus: " + oss);
-
+		alt_key = ( oss.contains("nix") | oss.contains("nux") | oss.contains("aix") | oss.contains("win") ? KeyEvent.VK_ALT : KeyEvent.VK_META);
+		//windows and linux have another alt key than mac, so lets determine the OS type, to determine the key code.
+		
 		int card = 0;
 		try {
 			Robot rob = new Robot();
 			while(should_run) {
+				Main.get().ui.info("Starting Battle.");
 				sleep(500);
 				clickL(rob, battle);//smash the start button
 				sleep(1000);
@@ -115,11 +110,11 @@ public class Clicker implements Runnable{
 				backfocus(rob);
 				//battle is starting up
 				sleep(9000);//wait for the battle to start (loading screen)
-				Main.get().ui.info("Battle started.");
 				inbattle = true;
 				float modifier = 1;
 				long start = System.currentTimeMillis();
 				long lastwait = start;//actions like moving mouse and do stuff gets messured and subtracted of the wait's
+				Main.get().ui.info("Battle begins.");
 				while( ((System.currentTimeMillis() - start) / 6000) < 41 & should_run & !skipbattle) {
 
 					//check für ok-button
@@ -169,13 +164,13 @@ public class Clicker implements Runnable{
 				clickL(rob, end);//ok button
 				backfocus(rob);
 				Main.get().ui.info("Battle ended.");
-				sleep(9000);//9 sec-loading screen
+				sleep(7000);//7 sec-loading screen
 				//checken, ob Arena wechsel pop-up
 				while(checkOK(arena_switch, rob,arena_view) & should_run) {
-					System.out.println("Arena found, clicking");
+					Main.get().ui.info("Arena found, clicking");
 					clickL(rob, arena_switch);
 					backfocus(rob);
-					sleep(2000);
+					sleep(2000);//wait 2 seconds
 				}
 			}
 		} catch (AWTException e) {
@@ -207,18 +202,14 @@ public class Clicker implements Runnable{
 
 	private void backfocus(Robot bot) {
 		if(backfocus) {
-			if(os == OSType.Windows | os == OSType.Linux)
-				bot.keyPress(KeyEvent.VK_ALT);
-			else//osx / unsupported
-				bot.keyPress(KeyEvent.VK_META);
-
+			
+			bot.keyPress(alt_key);
+			
 			bot.keyPress(KeyEvent.VK_TAB);
 			sleep(waittime);
 			bot.keyRelease(KeyEvent.VK_TAB);
-			if(os == OSType.Windows | os == OSType.Linux)
-				bot.keyRelease(KeyEvent.VK_ALT);
-			else//osx / unsupported
-				bot.keyRelease(KeyEvent.VK_META);
+			
+			bot.keyRelease(alt_key);
 		}
 	}
 
@@ -286,18 +277,26 @@ public class Clicker implements Runnable{
 		return (end != null & battle != null);
 	}
 
+	/**
+	 * Perform a Leftclick.
+	 * @param b the Robot to use
+	 * @param a the Position to click
+	 */
 	private void clickL(Robot b, Point a) {
 		if(!should_run)
 			return;
 		Point old = getMouse();
 		b.mouseMove(a.x, a.y);
-		sleep(50);
+		sleep(waittime);
 		clickL(b);
-		sleep(50);
 		b.mouseMove(old.x, old.y);
-		sleep(50);
+		sleep(waittime);
 	}
 
+	/**
+	 * Perform a Leftclick
+	 * @param b
+	 */
 	private void clickL(Robot b) {//40 ms delay
 		b.mousePress(InputEvent.BUTTON1_MASK);
 		sleep(waittime);
@@ -323,22 +322,22 @@ public class Clicker implements Runnable{
 			return false;
 		//long start = System.currentTimeMillis();
 		int count = 0;
-		BufferedImage img = bot.createScreenCapture(new Rectangle(p.x-10, p.y-10, 20, 20));//smile
-		for (int x = 0; x < 20; x++) {
-			for (int y = 0; y < 20; y++) {
+		BufferedImage img = bot.createScreenCapture(getRect(p.x, p.y));//smile
+		for (int x = 0; x < img.getWidth(); x++) {
+			for (int y = 0; y < img.getHeight(); y++) {
 				int color = img.getRGB(x, y);
 				int red = (color & 0x00ff0000) >> 16;
-			int green = (color & 0x0000ff00) >> 8;
-		int blue = color & 0x000000ff;
-		double distance = Math.sqrt(Math.pow((blue - goalcolor.getBlue()), 2)
+				int green = (color & 0x0000ff00) >> 8;
+				int blue = color & 0x000000ff;
+				double distance = Math.sqrt(Math.pow((blue - goalcolor.getBlue()), 2)
 				+ Math.pow((red - goalcolor.getRed()), 2) + Math.pow((green - goalcolor.getGreen()), 2));//calculate the distance between the goalcolor and the test color
-		if (distance < mincolordistance)
-			count++;
+				if (distance < mincolordistance)
+					count++;
 			}
 		}
 
-		//		System.out.println("counts: " + count);//some performance checking
-		return count > 70;
+		System.out.println("counts: " + count);//some performance checking
+		return count > 4;//engough pixel have the right color
 	}
 
 	public Point getMouse() {
@@ -374,7 +373,7 @@ public class Clicker implements Runnable{
 			arena_view = c;
 			break;
 		}
-		if(mincolordistance < minimumdistance)
+		if(mincolordistance < minimumdistance)//enlarging mindistance
 			mincolordistance = minimumdistance;
 		System.out.println(colornum + ": "+c.getRed() + " " + c.getGreen() + " " + c.getBlue());
 	}
@@ -388,10 +387,23 @@ public class Clicker implements Runnable{
 		paused = b;
 	}
 
-	private enum OSType {
-		Linux,
-		Windows,
-		OSX,
-		unsupported
+	public static Rectangle getRect(int x, int y) {
+		return new Rectangle(x-2, y-2, 5, 5);
+	}
+	
+	public void toggleOverlay() {
+		if(ov == null) {
+			try {
+				ov = new Overlay();
+				ov.set(playout, cardslots, end, battle, arena_switch);
+				ov.init();
+			} catch(Exception e) {
+				System.out.println("Catched Exception, while inflateing Overlay: ");
+				e.printStackTrace();
+			}
+		} else {
+			ov.close();
+			ov = null;
+		}
 	}
 }

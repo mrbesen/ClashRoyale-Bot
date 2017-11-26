@@ -42,6 +42,7 @@ public class UI implements ActionListener {
 	private JMenu file_ = new JMenu("File");
 	private JMenuItem load = new JMenuItem();
 	private JMenuItem save = new JMenuItem();
+	private JMenuItem new_ = new JMenuItem();
 
 	private AutoPlayBox autoplay = new AutoPlayBox();
 	private JCheckBox doubleplace = new JCheckBox("DoublePlace");
@@ -62,6 +63,7 @@ public class UI implements ActionListener {
 	private JButton skip = new JButton("SKIP"); // the button, to skip waiting
 	private JButton pause = new JButton("Pause");
 	private JButton exit = new JButton("EXIT");
+	private JButton overlay = new JButton("Overlay[Experimental]");
 
 	private JLabel info = new JLabel("Define positions, to start.");
 	private JLabel time = new JLabel("0 s");
@@ -89,17 +91,21 @@ public class UI implements ActionListener {
 
 	public UI() {
 		Main.get().ui = this;
+		
 		//init screen
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		frame.setSize(730, 180);
+		frame.setSize(830,( System.getProperty("os.name").toLowerCase().contains("win") ? 220 : 180));//extra large for windows
 
 		save.setText("Save");
 		save.addActionListener(this);
 		load.setText("Load");
 		load.addActionListener(this);
+		new_.setText("New");
+		new_.addActionListener(this);
 
 		file_.add(save);
 		file_.add(load);
+		file_.add(new_);
 		menubar.add(file_);
 		frame.setJMenuBar(menubar);
 
@@ -113,6 +119,7 @@ public class UI implements ActionListener {
 		start.addActionListener(this);
 		pause.addActionListener(this);
 		exit.addActionListener(this);
+		overlay.addActionListener(this);
 		doubleplace.addActionListener(this);
 		backfocus.addActionListener(this);
 
@@ -124,6 +131,7 @@ public class UI implements ActionListener {
 		middle.add(skip);
 		middle.add(pause);
 		middle.add(exit);
+		//middle.add(overlay);//added later
 		middle.add(autoplay);
 		middle.add(doubleplace);
 		middle.add(backfocus);
@@ -143,6 +151,28 @@ public class UI implements ActionListener {
 		
 		frame.add(root);//create frame
 		frame.setVisible(true);
+		
+		//set tooltips
+		start.setToolTipText("Starts the Bot.");
+		skip.setToolTipText("Skips the current Action.(Waiting or beeing in a match, only usefull, when the bot miss clicked somewhere)");
+		pause.setToolTipText("Pauses the \"output\" of the Bot, but the internal states are still updated.");
+		exit.setToolTipText("Stops the Bot and closes the Window.");
+		overlay.setToolTipText("Enables a Overlay to visualize where the Bot trys to click.");
+		autoplay.setToolTipText("Enable or disable auto placement of cards.");
+		doubleplace.setToolTipText("Everytime the bot wants to play a card, he trys to play two cards at once.");
+		backfocus.setToolTipText("After each mouseclickaction the bot tryes to give the old window the focus back.");
+		slider[0].setToolTipText("the time the Bot waits between two crads.");
+		slider[1].setToolTipText("Give a value, how offset the playout place should be, to look more like a human player to the opponent and the game itself.");
+		
+		posselctors[0].button.setToolTipText("Set the position for the \"Battle\"-Button.");
+		posselctors[1].button.setToolTipText("Set the position for the \"ok\"-Button at the end of a match. Be carefull, this also saves the color of the button to auto-detect it.");
+		posselctors[2].button.setToolTipText("Set the Position of Card 1");
+		posselctors[3].button.setToolTipText("Set the Position of Card 2");
+		posselctors[4].button.setToolTipText("Set the Position of Card 3");
+		posselctors[5].button.setToolTipText("Set the Position of Card 4");
+		posselctors[6].button.setToolTipText("Set the Position, where a Card should be placed. Leave it empty to use the same position as the \"Battle\" position.");
+		posselctors[7].button.setToolTipText("Set the position of the Close button, of the menue that po up, when you tap the arena. This one also saves the color of the position to auto detect it.");
+		
 	}
 
 	@Override
@@ -187,6 +217,8 @@ public class UI implements ActionListener {
 					info("Paused.");
 				}
 				bot.setPause(!bot.isPaused());
+			} else if(srcb.equals(overlay)) {
+				bot.toggleOverlay();
 			}
 		} else if(src instanceof JMenuItem) {
 			JMenuItem srcI = (JMenuItem) src;
@@ -194,6 +226,8 @@ public class UI implements ActionListener {
 				load(true);
 			} else if(srcI.equals(save)) {
 				save();
+			} else if(srcI.equals(new_)) {
+				new_();
 			}
 		} else if(src instanceof JCheckBox) {
 			JCheckBox srcb = (JCheckBox) src;
@@ -282,6 +316,17 @@ public class UI implements ActionListener {
 		}
 	}
 
+	private void new_() {
+		int choose = JOptionPane.showConfirmDialog(null, "All of your setting are going to be lost, if you dont save it.", "Settings lost", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if(choose == 2) {
+			info("canceled.");
+			return;
+		}
+		bot.stop();
+		bot = null;
+		bot = new Clicker();
+	}
+	
 	public void refresh() {
 		//check if all required positions are set
 		// & set the colors
