@@ -13,6 +13,7 @@ import java.util.Scanner;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -23,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.sun.istack.internal.Nullable;
 
@@ -68,6 +70,8 @@ public class UI implements ActionListener {
 	private JLabel info = new JLabel("Define positions, to start.");
 	private JLabel time = new JLabel("0 s");
 
+	private JFileChooser filechooser = new JFileChooser();
+	
 	private Slider[] slider = {
 			new Slider("Waittime: ","s", 1,300,180,-1, null, new Updater() {
 				@Override
@@ -82,12 +86,8 @@ public class UI implements ActionListener {
 				}
 			},false)
 	};
-	
-	
-	Clicker bot = new Clicker();
 
-	
-	private File file = new File(".profile");
+	Clicker bot = new Clicker();
 
 	public UI() {
 		Main.get().ui = this;
@@ -153,7 +153,7 @@ public class UI implements ActionListener {
 		frame.setVisible(true);
 		
 		//set tooltips
-		start.setToolTipText("Starts the Bot.");
+		start.setToolTipText("Starts the Bot. (When gray, try to set the positions for the red buttons!)");
 		skip.setToolTipText("Skips the current Action.(Waiting or beeing in a match, only usefull, when the bot miss clicked somewhere)");
 		pause.setToolTipText("Pauses the \"output\" of the Bot, but the internal states are still updated.");
 		exit.setToolTipText("Stops the Bot and closes the Window.");
@@ -173,6 +173,8 @@ public class UI implements ActionListener {
 		posselctors[6].button.setToolTipText("Set the Position, where a Card should be placed. Leave it empty to use the same position as the \"Battle\" position.");
 		posselctors[7].button.setToolTipText("Set the position of the Close button, of the menue that po up, when you tap the arena. This one also saves the color of the position to auto detect it.");
 		
+		filechooser.removeChoosableFileFilter(filechooser.getAcceptAllFileFilter());
+		filechooser.addChoosableFileFilter(new FileNameExtensionFilter("Botsettings", "profile"));
 	}
 
 	@Override
@@ -207,6 +209,7 @@ public class UI implements ActionListener {
 			else if(srcb.equals(exit)) { 
 				bot.stop();
 				frame.setVisible(false);
+				frame.dispose();
 				System.exit(0);
 			} else if(srcb.equals(pause)) {
 				if(bot.isPaused()) {//the bot is going to be unpaused
@@ -223,9 +226,18 @@ public class UI implements ActionListener {
 		} else if(src instanceof JMenuItem) {
 			JMenuItem srcI = (JMenuItem) src;
 			if(srcI.equals(load)) {
-				load(true);
+				int returnval = filechooser.showOpenDialog(frame);
+				if(returnval == JFileChooser.APPROVE_OPTION) {
+					File f = filechooser.getSelectedFile();
+					load(f, true);
+				} else 
+					info("cancled.");
 			} else if(srcI.equals(save)) {
-				save();
+				int returnval = filechooser.showOpenDialog(frame);
+				if(returnval == JFileChooser.APPROVE_OPTION) {
+					save(filechooser.getSelectedFile());
+				} else 
+					info("cancled.");
 			} else if(srcI.equals(new_)) {
 				new_();
 			}
@@ -244,10 +256,10 @@ public class UI implements ActionListener {
 		}
 	}
 
-	private void load(boolean info) {
-		if(file.exists()) {
+	private void load(File f, boolean info) {
+		if(f.exists()) {
 			try { 
-				Scanner s = new Scanner(file);
+				Scanner s = new Scanner(f);
 				while(s.hasNextLine()) {
 					String split[] = s.nextLine().split(" ");
 					if(!split[1].equals("null")) {
@@ -289,11 +301,11 @@ public class UI implements ActionListener {
 				info("no profile found.");
 	}
 
-	private void save() {
+	private void save(File f) {
 		try {
-			if(!file.exists())
-				file.createNewFile();
-			else {
+			if(!f.getName().endsWith(".profile"))
+				f = new File(f.getAbsoluteFile() + ".profile");
+			if(f.exists()){
 				/*ok == 0
 				cancel = 2*/ 
 				int choose = JOptionPane.showConfirmDialog(null, "You are going to override the old profile!", "Override", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -302,9 +314,10 @@ public class UI implements ActionListener {
 					return;
 				}
 					
-			}
+			} else 
+				f.createNewFile();
 
-			FileWriter fw = new FileWriter(file);
+			FileWriter fw = new FileWriter(f);
 			fw.write(bot.serialize()+"\n101 "+ slider[0].getValue() + "\n102 " + doubleplace.isSelected()+"\n103 " + slider[1].getValue());
 			fw.flush();
 			fw.close();
@@ -325,6 +338,17 @@ public class UI implements ActionListener {
 		bot.stop();
 		bot = null;
 		bot = new Clicker();
+		
+		//set all buttons to red
+		start.setEnabled(false);
+		skip.setEnabled(false);
+		for(PosSelector poss : posselctors) {
+			poss.red();
+		}
+		
+		for(Slider s : slider) {
+			s.reset();
+		}
 	}
 	
 	public void refresh() {
@@ -447,7 +471,7 @@ public class UI implements ActionListener {
 		private static final long serialVersionUID = 1L;
 		private JSlider slider;
 		private JLabel label;
-
+		private int defaultvalue;
 		private ChangeListener listener;
 		private Updater updater;
 		private String prefix = "", sufix = "";
@@ -475,6 +499,7 @@ public class UI implements ActionListener {
 			listener = cl;
 			updater = upd;
 			slider.setEnabled(enabled);
+			defaultvalue = startvalue;
 		}
 		
 		public int getValue() {
@@ -503,6 +528,13 @@ public class UI implements ActionListener {
 				listener.stateChanged(e);//forward Event
 			if(updater != null)
 				updater.update(slider.getValue());
+		}
+	
+		/**
+		 * Restores the default value, does not change the controlled value, just the displayed one		
+		 */
+		public void reset() {
+			setValue(defaultvalue);
 		}
 	}
 }

@@ -11,6 +11,7 @@ public class PosSelector implements Runnable {
 	UI ui;
 	private boolean required;
 	
+	
 	public boolean isRequired() {
 		return required;
 	}

@@ -3,3 +3,4 @@ export.jardesc
 .project
 .classpath
 .profile
+/default.profile

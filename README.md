@@ -22,11 +22,11 @@ Bot losses some matches -> Bot gets easyer oponents -> Bot winns some matches (A
 This java Apllication needs some kind of Mobile Device Emulator or Interface.
 I have tested it with Teamviewer and Nox Appplayer. You can configure points of the Clashroyale app, where the bot automatically clicks.
 These clicks can cause Troops to spawn or Buttons to be Pressed.
-## Video:
+## Video (a bit outdated):
 [![Video](https://i.vimeocdn.com/video/641445132_640.jpg)](https://vimeo.com/222811186 "Video")
 
 #### How does it work?
-This program emulates a mouse and keyboard and controls your computer with that emulated hardware. To The App it look, like you are a normal User.
+This program emulates a mouse and keyboard and controls your computer with that emulated hardware. To The App it look, like you are a normal user.
 
 #### Features:
  * Automated Backfocus
