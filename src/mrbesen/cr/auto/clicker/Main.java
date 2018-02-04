@@ -1,5 +1,7 @@
 package mrbesen.cr.auto.clicker;
 
+import javax.swing.*;
+
 public class Main {
 	
 	private static Main main;
@@ -11,7 +13,12 @@ public class Main {
 	
 	public Main() {
 		main = this;
-		new UI();
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        new UI();
 	}
 	
 	public static Main get() {
