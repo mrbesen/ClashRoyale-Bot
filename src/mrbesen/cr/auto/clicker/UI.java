@@ -94,7 +94,7 @@ public class UI implements ActionListener {
 		
 		//init screen
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		frame.setSize(830, 220);
+		frame.setSize(830, ( System.getProperty("os.name").toLowerCase().contains("nix") ? 180 : 220));
 
 		save.setText("Save");
 		save.addActionListener(this);
