@@ -94,7 +94,7 @@ public class UI implements ActionListener {
 		
 		//init screen
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		frame.setSize(830,( System.getProperty("os.name").toLowerCase().contains("win") ? 220 : 180));//extra large for windows
+		frame.setSize(830, ( System.getProperty("os.name").toLowerCase().contains("nux") ? 180 : 220));
 
 		save.setText("Save");
 		save.addActionListener(this);
@@ -131,7 +131,7 @@ public class UI implements ActionListener {
 		middle.add(skip);
 		middle.add(pause);
 		middle.add(exit);
-		//middle.add(overlay);//added later
+		middle.add(overlay);//added later
 		middle.add(autoplay);
 		middle.add(doubleplace);
 		middle.add(backfocus);
