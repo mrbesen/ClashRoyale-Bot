@@ -131,7 +131,7 @@ public class UI implements ActionListener {
 		middle.add(skip);
 		middle.add(pause);
 		middle.add(exit);
-		//middle.add(overlay);//added later
+		middle.add(overlay);//added later
 		middle.add(autoplay);
 		middle.add(doubleplace);
 		middle.add(backfocus);
