@@ -1,12 +1,9 @@
 package mrbesen.cr.auto.clicker;
 
-<<<<<<< HEAD
 import javax.swing.*;
-=======
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsDevice.WindowTranslucency;
 import java.awt.GraphicsEnvironment;
->>>>>>> refs/heads/dev
 
 public class Main {
 	
