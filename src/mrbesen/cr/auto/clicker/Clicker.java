@@ -72,11 +72,16 @@ public class Clicker implements Runnable{
 	}
 
 	public void stop() {
+		if(ov != null)
+			ov.close();
+		
 		should_run = false;
 		skipbattle = true;
+		System.out.println("interupting!");
 		while(running) {
 			thread.interrupt();//stop that shit (its maybe sleeping)
 		}
+		System.out.println("Bot stopped!");
 	}
 
 	public void skip() {
@@ -396,7 +401,7 @@ public class Clicker implements Runnable{
 			try {
 				ov = new Overlay();
 				ov.set(playout, cardslots, end, battle, arena_switch);
-				ov.init();
+				//ov.init();
 			} catch(Exception e) {
 				System.out.println("Catched Exception, while inflateing Overlay: ");
 				e.printStackTrace();
