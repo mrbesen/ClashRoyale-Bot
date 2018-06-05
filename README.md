@@ -1,3 +1,6 @@
+# THIS REPO IS CONTINUED [HERE](http://git.mrbesen.de/mrbesen/ClashRoyale-Bot)
+
+
 # ClashRoyale-Bot
 A Bot, that controls ClashRoyal. Perfect for Crown farming.
 
