@@ -1,4 +1,4 @@
-# THIS REPO IS CONTINUED [HERE](http://git.mrbesen.de/mrbesen/ClashRoyale-Bot)
+# THIS REPO IS CONTINUED [HERE](https://git.mrbesen.de/MrBesen/ClashRoyale-Bot)
 
 
 # ClashRoyale-Bot
